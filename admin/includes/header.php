@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../includes/db.php'; // Conexi贸n a la BD
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración de Asambleas</title>
+    <title>Panel de Administraci贸n de Asambleas</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -17,7 +17,7 @@ require_once __DIR__ . '/../../includes/db.php'; // Conexi贸n a la BD
     <a href="index.php">Dashboard</a>
     <a href="meetings.php">Reuniones</a>
     <a href="properties.php">Propiedades</a>
-    <a href="settings.php">Configuracion</a> <a href="logout.php">Salir</a>
+    <a href="settings.php">Configuraci贸n</a> <a href="logout.php">Salir</a>
 </nav>
     </header>
     <main class="admin-main">
