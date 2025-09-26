@@ -3,7 +3,7 @@
 
 // Cargar la configuración local de forma segura.
 // Se utiliza __DIR__ para asegurar que la ruta sea siempre relativa al archivo actual.
-require_once __DIR__ . '/config.local.php';
+require_once __DIR__ . '/config.php';
 
 try {
     // Establecer la conexión PDO con la base de datos.
