@@ -1,1 +1,141 @@
-# Log de depuración para la API
+# Log de depuración para la API[2025-09-26 13:44:45] --- Nueva solicitud a login.php ---
+[2025-09-26 13:44:45] Dependencias cargadas correctamente.
+[2025-09-26 13:44:45] Acción recibida: 'check_id'
+[2025-09-26 13:44:45] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 13:44:45] Preparando la consulta a la base de datos.
+[2025-09-26 13:44:45] Ejecutando la consulta.
+[2025-09-26 13:44:45] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 13:44:45] Datos del usuario preparados para la respuesta.
+[2025-09-26 13:44:45] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 13:44:53] --- Nueva solicitud a login.php ---
+[2025-09-26 13:44:53] Dependencias cargadas correctamente.
+[2025-09-26 13:44:53] Acción recibida: 'send_code'
+[2025-09-26 13:44:53] Acción 'send_code' invocada.
+[2025-09-26 13:44:53] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado (simulado)."}
+[2025-09-26 13:45:30] --- Nueva solicitud a login.php ---
+[2025-09-26 13:45:30] Dependencias cargadas correctamente.
+[2025-09-26 13:45:30] Acción recibida: 'check_id'
+[2025-09-26 13:45:30] Iniciando 'check_id' para la cédula: '123'
+[2025-09-26 13:45:30] Preparando la consulta a la base de datos.
+[2025-09-26 13:45:30] Ejecutando la consulta.
+[2025-09-26 13:45:30] Consulta ejecutada. Resultado: Usuario NO encontrado
+[2025-09-26 13:45:30] Respondiendo que la cédula no está registrada.
+[2025-09-26 13:45:30] Respuesta final enviada: {"success":false,"message":"La c\u00e9dula no se encuentra registrada."}
+[2025-09-26 13:45:35] --- Nueva solicitud a login.php ---
+[2025-09-26 13:45:35] Dependencias cargadas correctamente.
+[2025-09-26 13:45:35] Acción recibida: 'check_id'
+[2025-09-26 13:45:35] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 13:45:35] Preparando la consulta a la base de datos.
+[2025-09-26 13:45:35] Ejecutando la consulta.
+[2025-09-26 13:45:35] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 13:45:35] Datos del usuario preparados para la respuesta.
+[2025-09-26 13:45:35] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 13:47:13] --- Nueva solicitud a login.php ---
+[2025-09-26 13:47:13] Dependencias cargadas correctamente.
+[2025-09-26 13:47:13] Acción recibida: 'check_id'
+[2025-09-26 13:47:13] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 13:47:13] Preparando la consulta a la base de datos.
+[2025-09-26 13:47:13] Ejecutando la consulta.
+[2025-09-26 13:47:13] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 13:47:13] Datos del usuario preparados para la respuesta.
+[2025-09-26 13:47:13] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 13:48:03] --- Nueva solicitud a login.php ---
+[2025-09-26 13:48:03] Dependencias cargadas correctamente.
+[2025-09-26 13:48:03] Acción recibida: 'check_id'
+[2025-09-26 13:48:03] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 13:48:03] Preparando la consulta a la base de datos.
+[2025-09-26 13:48:03] Ejecutando la consulta.
+[2025-09-26 13:48:03] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 13:48:03] Datos del usuario preparados para la respuesta.
+[2025-09-26 13:48:03] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 13:59:39] --- Nueva solicitud a login.php ---
+[2025-09-26 13:59:39] Dependencias cargadas correctamente.
+[2025-09-26 13:59:39] Acción recibida: 'check_id'
+[2025-09-26 13:59:39] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 13:59:39] Preparando la consulta a la base de datos.
+[2025-09-26 13:59:39] Ejecutando la consulta.
+[2025-09-26 13:59:39] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 13:59:39] Datos del usuario preparados para la respuesta.
+[2025-09-26 13:59:39] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 13:59:41] --- Nueva solicitud a login.php ---
+[2025-09-26 13:59:41] Dependencias cargadas correctamente.
+[2025-09-26 13:59:41] Acción recibida: 'send_code'
+[2025-09-26 13:59:41] Iniciando 'send_code' para la cédula: '55167759'
+[2025-09-26 13:59:41] Código generado (848097) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-09-26 14:06:22] --- Nueva solicitud a login.php ---
+[2025-09-26 14:06:22] Dependencias cargadas correctamente.
+[2025-09-26 14:06:22] Acción recibida: 'check_id'
+[2025-09-26 14:06:22] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 14:06:22] Preparando la consulta a la base de datos.
+[2025-09-26 14:06:22] Ejecutando la consulta.
+[2025-09-26 14:06:22] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 14:06:22] Datos del usuario preparados para la respuesta.
+[2025-09-26 14:06:22] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 14:06:23] --- Nueva solicitud a login.php ---
+[2025-09-26 14:06:23] Dependencias cargadas correctamente.
+[2025-09-26 14:06:23] Acción recibida: 'send_code'
+[2025-09-26 14:06:23] Iniciando 'send_code' para la cédula: '55167759'
+[2025-09-26 14:06:23] Código generado (566248) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-09-26 14:06:23] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-09-26 14:06:23] API Key obtenida correctamente.
+[2025-09-26 14:06:23] Cliente de la API de Sendinblue configurado.
+[2025-09-26 14:06:23] Objeto de email creado. Listo para enviar.
+[2025-09-26 14:06:24] Llamada a sendTransacEmail completada exitosamente para andreyvillamarin@gmail.com.
+[2025-09-26 14:06:24] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-26 14:06:39] --- Nueva solicitud a login.php ---
+[2025-09-26 14:06:39] Dependencias cargadas correctamente.
+[2025-09-26 14:06:39] Acción recibida: 'verify_code'
+[2025-09-26 14:06:39] Acción 'verify_code' invocada.
+[2025-09-26 14:06:39] Respuesta final enviada: {"success":true,"redirect":"meeting.php (simulado)"}
+[2025-09-26 14:11:10] --- Nueva solicitud a login.php ---
+[2025-09-26 14:11:10] Dependencias cargadas correctamente.
+[2025-09-26 14:11:10] Acción recibida: 'check_id'
+[2025-09-26 14:11:10] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 14:11:10] Preparando la consulta a la base de datos.
+[2025-09-26 14:11:10] Ejecutando la consulta.
+[2025-09-26 14:11:10] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 14:11:10] Datos del usuario preparados para la respuesta.
+[2025-09-26 14:11:10] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 14:11:11] --- Nueva solicitud a login.php ---
+[2025-09-26 14:11:11] Dependencias cargadas correctamente.
+[2025-09-26 14:11:11] Acción recibida: 'send_code'
+[2025-09-26 14:11:11] Iniciando 'send_code' para la cédula: '55167759'
+[2025-09-26 14:11:11] Código generado (814761) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-09-26 14:11:11] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-09-26 14:11:11] API Key obtenida correctamente.
+[2025-09-26 14:11:11] Cliente de la API de Sendinblue configurado.
+[2025-09-26 14:11:11] Objeto de email creado. Listo para enviar.
+[2025-09-26 14:11:11] Llamada a sendTransacEmail completada exitosamente para andreyvillamarin@gmail.com.
+[2025-09-26 14:11:11] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-26 14:11:31] --- Nueva solicitud a login.php ---
+[2025-09-26 14:11:31] Dependencias cargadas correctamente.
+[2025-09-26 14:11:31] Acción recibida: 'verify_code'
+[2025-09-26 14:11:31] Iniciando 'verify_code' para la cédula: '55167759' con el código: '814761'
+[2025-09-26 14:11:31] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-09-26 14:11:31] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-09-26 14:25:19] --- Nueva solicitud a login.php ---
+[2025-09-26 14:25:19] Dependencias cargadas correctamente.
+[2025-09-26 14:25:19] Acción recibida: 'check_id'
+[2025-09-26 14:25:19] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-26 14:25:19] Preparando la consulta a la base de datos.
+[2025-09-26 14:25:19] Ejecutando la consulta.
+[2025-09-26 14:25:19] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-26 14:25:19] Datos del usuario preparados para la respuesta.
+[2025-09-26 14:25:19] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-26 14:25:21] --- Nueva solicitud a login.php ---
+[2025-09-26 14:25:21] Dependencias cargadas correctamente.
+[2025-09-26 14:25:21] Acción recibida: 'send_code'
+[2025-09-26 14:25:21] Iniciando 'send_code' para la cédula: '55167759'
+[2025-09-26 14:25:21] Código generado (474940) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-09-26 14:25:21] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-09-26 14:25:21] API Key obtenida correctamente.
+[2025-09-26 14:25:21] Cliente de la API de Sendinblue configurado.
+[2025-09-26 14:25:21] Objeto de email creado. Listo para enviar.
+[2025-09-26 14:25:23] Llamada a sendTransacEmail completada exitosamente para andreyvillamarin@gmail.com.
+[2025-09-26 14:25:23] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-26 14:25:40] --- Nueva solicitud a login.php ---
+[2025-09-26 14:25:40] Dependencias cargadas correctamente.
+[2025-09-26 14:25:40] Acción recibida: 'verify_code'
+[2025-09-26 14:25:40] Iniciando 'verify_code' para la cédula: '55167759' con el código: '474940'
+[2025-09-26 14:25:40] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-09-26 14:25:40] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}

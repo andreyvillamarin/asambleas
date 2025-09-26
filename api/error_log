@@ -1,0 +1,5 @@
+[26-Sep-2025 13:59:41 America/Bogota] PHP Fatal error:  Uncaught Error: Class "Brevo\Client\Configuration" not found in /home/qdosnetw/public_html/demos/asambleas/includes/functions.php:26
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/api/login.php(114): send_login_code()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/functions.php on line 26

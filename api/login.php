@@ -13,7 +13,6 @@ function write_log($message) {
 write_log("--- Nueva solicitud a login.php ---");
 
 // --- Inclusión de Dependencias ---
-// Colocar el require después de la función de log para poder registrar errores de inclusión
 try {
     require_once '../includes/db.php';
     require_once '../includes/functions.php';
@@ -80,14 +79,106 @@ if ($action === 'check_id') {
     }
 
 } elseif ($action === 'send_code') {
-    // ... (lógica futura)
-    write_log("Acción 'send_code' invocada.");
-    $response = ['success' => true, 'message' => 'Código enviado (simulado).'];
+    $id_card = $_POST['id_card'] ?? '';
+    write_log("Iniciando 'send_code' para la cédula: '$id_card'");
 
+    if (empty($id_card)) {
+        $response['message'] = 'No se proporcionó una cédula.';
+        echo json_encode($response);
+        exit;
+    }
+
+    try {
+        // Obtener el email del usuario
+        $stmt = $pdo->prepare("SELECT owner_email FROM properties WHERE owner_id_card = ?");
+        $stmt->execute([$id_card]);
+        $recipient_email = $stmt->fetchColumn();
+
+        if (!$recipient_email) {
+            $response['message'] = 'No se pudo encontrar el usuario para enviar el código.';
+            write_log("Error en send_code: No se encontró un usuario con la cédula {$id_card}.");
+            echo json_encode($response);
+            exit;
+        }
+
+        // Generar y guardar el código de login
+        $login_code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $expires_at = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+
+        $stmt = $pdo->prepare("UPDATE properties SET login_code = ?, login_code_expires_at = ? WHERE owner_id_card = ?");
+        $stmt->execute([$login_code, $expires_at, $id_card]);
+        
+        write_log("Código generado ({$login_code}) para {$recipient_email}. Intentando enviar email...");
+
+        // Enviar el email
+        if (send_login_code($recipient_email, $login_code)) {
+            $response = ['success' => true, 'message' => 'Código enviado correctamente.'];
+        } else {
+            $response['message'] = 'Hubo un error al enviar el código de acceso por correo. Por favor, contacta a soporte.';
+        }
+
+    } catch (PDOException $e) {
+        write_log("¡ERROR DE PDO en send_code! Mensaje: " . $e->getMessage());
+        $response['message'] = 'Error de base de datos. Por favor, asegúrate de que la migración de la base de datos se haya ejecutado.';
+    } catch (Exception $e) {
+        write_log("¡ERROR GENERAL en send_code! Mensaje: " . $e->getMessage());
+        $response['message'] = 'Ocurrió un error inesperado al enviar el código.';
+    }
 } elseif ($action === 'verify_code') {
-    // ... (lógica futura)
-    write_log("Acción 'verify_code' invocada.");
-    $response = ['success' => true, 'redirect' => 'meeting.php (simulado)'];
+    $id_card = $_POST['id_card'] ?? '';
+    $code = $_POST['code'] ?? '';
+    write_log("Iniciando 'verify_code' para la cédula: '$id_card' con el código: '$code'");
+
+    if (empty($id_card) || empty($code)) {
+        $response['message'] = 'Por favor, proporciona la cédula y el código.';
+        echo json_encode($response);
+        exit;
+    }
+
+    try {
+        // Obtener el código y la fecha de expiración de la base de datos
+        $stmt = $pdo->prepare("SELECT login_code, login_code_expires_at FROM properties WHERE owner_id_card = ?");
+        $stmt->execute([$id_card]);
+        $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user_data) {
+            $response['message'] = 'Usuario no encontrado.';
+            write_log("Error en verify_code: No se encontró usuario con la cédula {$id_card}.");
+            echo json_encode($response);
+            exit;
+        }
+
+        $stored_code = $user_data['login_code'];
+        $expires_at_str = $user_data['login_code_expires_at'];
+        
+        // Verificar si el código es correcto y no ha expirado
+        if ($stored_code === $code && (new DateTime() < new DateTime($expires_at_str))) {
+            // El código es válido. Iniciar sesión.
+            $_SESSION['user_id_card'] = $id_card;
+            $_SESSION['logged_in'] = true;
+            
+            // Limpiar el código de la base de datos después de usarlo
+            $stmt = $pdo->prepare("UPDATE properties SET login_code = NULL, login_code_expires_at = NULL WHERE owner_id_card = ?");
+            $stmt->execute([$id_card]);
+
+            write_log("Verificación exitosa para la cédula {$id_card}. Redirigiendo a meeting.php.");
+            $response = [
+                'success' => true,
+                'redirect' => 'meeting.php' // URL real de la reunión
+            ];
+        } else {
+            // El código es incorrecto o ha expirado
+            write_log("Error en verify_code: El código para la cédula {$id_card} es incorrecto o ha expirado.");
+            $response['message'] = 'El código es incorrecto o ha expirado. Por favor, inténtalo de nuevo.';
+        }
+
+    } catch (PDOException $e) {
+        write_log("¡ERROR DE PDO en verify_code! Mensaje: " . $e->getMessage());
+        $response['message'] = 'Error de base de datos al verificar el código.';
+    } catch (Exception $e) {
+        write_log("¡ERROR GENERAL en verify_code! Mensaje: " . $e->getMessage());
+        $response['message'] = 'Ocurrió un error inesperado al verificar el código.';
+    }
 }
 
 write_log("Respuesta final enviada: " . json_encode($response));

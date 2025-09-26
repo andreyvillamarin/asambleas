@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const whatsappContact = document.getElementById('whatsapp-contact');
 
+    // --- Elementos del Formulario ---
+    const formCheckId = document.getElementById('form-check-id');
+    const formVerifyCode = document.getElementById('form-verify-code');
+    
     // --- Botones ---
     const btnCheckId = document.getElementById('btn-check-id');
     const btnConfirmData = document.getElementById('btn-confirm-data');
@@ -52,102 +56,113 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica de Eventos ---
 
     // 1. Consultar Cédula
-    btnCheckId.addEventListener('click', async () => {
-        const id_card = idCardInput.value.trim();
-        if (!id_card) {
-            showError('Por favor, ingresa tu número de cédula.');
-            return;
-        }
-
-        setLoadingState(btnCheckId, true);
-        
-        const formData = new FormData();
-        formData.append('action', 'check_id');
-        formData.append('id_card', id_card);
-
-        try {
-            const response = await fetch('api/login.php', { method: 'POST', body: formData });
-            const result = await response.json();
-
-            if (result.success) {
-                document.getElementById('user-name').textContent = result.data.name;
-                document.getElementById('user-house').textContent = result.data.house;
-                document.getElementById('user-email-hint').textContent = result.data.email_hint;
-                showStep(2);
-            } else {
-                showError(result.message || 'Error desconocido.');
+    if (formCheckId) {
+        formCheckId.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevenir el envío tradicional del formulario
+            
+            const id_card = idCardInput.value.trim();
+            if (!id_card) {
+                showError('Por favor, ingresa tu número de cédula.');
+                return;
             }
-        } catch (error) {
-            showError('Error de conexión con el servidor. Inténtalo de nuevo.');
-        } finally {
-            setLoadingState(btnCheckId, false);
-        }
-    });
+
+            setLoadingState(btnCheckId, true);
+            
+            const formData = new FormData();
+            formData.append('action', 'check_id');
+            formData.append('id_card', id_card);
+
+            try {
+                const response = await fetch('/demos/asambleas/api/login.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('user-name').textContent = result.data.name;
+                    document.getElementById('user-house').textContent = result.data.house;
+                    document.getElementById('user-email-hint').textContent = result.data.email_hint;
+                    showStep(2);
+                } else {
+                    showError(result.message || 'Error desconocido.');
+                }
+            } catch (error) {
+                showError('Error de conexión con el servidor. Inténtalo de nuevo.');
+            } finally {
+                setLoadingState(btnCheckId, false);
+            }
+        });
+    }
 
     // 2. Confirmar Datos y Enviar Código
-    btnConfirmData.addEventListener('click', async () => {
-        const id_card = idCardInput.value.trim();
-        setLoadingState(btnConfirmData, true);
+    if (btnConfirmData) {
+        btnConfirmData.addEventListener('click', async () => {
+            const id_card = idCardInput.value.trim();
+            setLoadingState(btnConfirmData, true);
 
-        const formData = new FormData();
-        formData.append('action', 'send_code');
-        formData.append('id_card', id_card);
+            const formData = new FormData();
+            formData.append('action', 'send_code');
+            formData.append('id_card', id_card);
 
-        try {
-            const response = await fetch('api/login.php', { method: 'POST', body: formData });
-            const result = await response.json();
+            try {
+                const response = await fetch('/demos/asambleas/api/login.php', { method: 'POST', body: formData });
+                const result = await response.json();
 
-            if (result.success) {
-                showStep(3);
-            } else {
-                showError(result.message || 'No se pudo enviar el código.');
+                if (result.success) {
+                    showStep(3);
+                } else {
+                    showError(result.message || 'No se pudo enviar el código.');
+                }
+            } catch (error) {
+                showError('Error de conexión. No se pudo enviar el código.');
+            } finally {
+                setLoadingState(btnConfirmData, false);
             }
-        } catch (error) {
-            showError('Error de conexión. No se pudo enviar el código.');
-        } finally {
-            setLoadingState(btnConfirmData, false);
-        }
-    });
+        });
+    }
     
     // 3. Verificar Código de Acceso
-    btnVerifyCode.addEventListener('click', async () => {
-        const id_card = idCardInput.value.trim();
-        const code = document.getElementById('login_code').value.trim();
+    if (formVerifyCode) {
+        formVerifyCode.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const id_card = idCardInput.value.trim();
+            const code = document.getElementById('login_code').value.trim();
 
-        if (!code) {
-            showError('Por favor, ingresa el código de verificación.');
-            return;
-        }
-
-        setLoadingState(btnVerifyCode, true);
-        
-        const formData = new FormData();
-        formData.append('action', 'verify_code');
-        formData.append('id_card', id_card);
-        formData.append('code', code);
-
-        try {
-            const response = await fetch('api/login.php', { method: 'POST', body: formData });
-            const result = await response.json();
-
-            if (result.success && result.redirect) {
-                window.location.href = result.redirect;
-            } else {
-                showError(result.message || 'El código es incorrecto o ha expirado.');
+            if (!code) {
+                showError('Por favor, ingresa el código de verificación.');
+                return;
             }
-        } catch (error) {
-            showError('Error de conexión al verificar el código.');
-        } finally {
-            setLoadingState(btnVerifyCode, false);
-        }
-    });
+
+            setLoadingState(btnVerifyCode, true);
+            
+            const formData = new FormData();
+            formData.append('action', 'verify_code');
+            formData.append('id_card', id_card);
+            formData.append('code', code);
+
+            try {
+                const response = await fetch('/demos/asambleas/api/login.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.success && result.redirect) {
+                    window.location.href = result.redirect;
+                } else {
+                    showError(result.message || 'El código es incorrecto o ha expirado.');
+                }
+            } catch (error) {
+                showError('Error de conexión al verificar el código.');
+            } finally {
+                setLoadingState(btnVerifyCode, false);
+            }
+        });
+    }
     
     // 4. Rechazar Datos
-    btnRejectData.addEventListener('click', () => {
-        showStep(1); // Vuelve al paso 1
-        whatsappContact.classList.remove('hidden');
-        showError("Por favor, contacta al administrador para corregir tus datos.");
-    });
+    if (btnRejectData) {
+        btnRejectData.addEventListener('click', () => {
+            showStep(1); // Vuelve al paso 1
+            whatsappContact.classList.remove('hidden');
+            showError("Por favor, contacta al administrador para corregir tus datos.");
+        });
+    }
 });
 
 // --- Añadir CSS para el Spinner ---
