@@ -1,0 +1,14 @@
+/* admin/assets/style.css */
+body { font-family: sans-serif; margin: 0; background-color: #f0f2f5; }
+.admin-header { background-color: #2c3e50; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+.admin-header h1 { margin: 0; font-size: 24px; }
+.admin-header nav a { color: white; text-decoration: none; margin-left: 20px; }
+.admin-main { max-width: 1200px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 5px; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+th { background-color: #f7f7f7; }
+.form-container, .data-actions { background: #f9f9f9; border: 1px solid #eee; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+label { display: block; margin-bottom: 8px; font-weight: bold; }
+input[type="text"], input[type="datetime-local"], input[type="number"], select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+button, .button { padding: 10px 15px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.danger { background-color: #e74c3c; }
