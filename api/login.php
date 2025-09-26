@@ -1,57 +1,95 @@
 <?php
 // api/login.php
 session_start();
-require '../includes/db.php';
-require '../includes/functions.php';
+
+// --- Función de Depuración ---
+function write_log($message) {
+    $log_file = __DIR__ . '/debug.log';
+    $timestamp = date('Y-m-d H:i:s');
+    // Usar FILE_APPEND para añadir al archivo, LOCK_EX para evitar escrituras simultáneas
+    file_put_contents($log_file, "[$timestamp] " . $message . "\n", FILE_APPEND | LOCK_EX);
+}
+
+write_log("--- Nueva solicitud a login.php ---");
+
+// --- Inclusión de Dependencias ---
+// Colocar el require después de la función de log para poder registrar errores de inclusión
+try {
+    require_once '../includes/db.php';
+    require_once '../includes/functions.php';
+    write_log("Dependencias cargadas correctamente.");
+} catch (Exception $e) {
+    write_log("Error fatal al cargar dependencias: " . $e->getMessage());
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Error interno del servidor.']);
+    exit;
+}
+
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => 'Solicitud inválida.'];
 $action = $_POST['action'] ?? '';
+write_log("Acción recibida: '$action'");
 
 if ($action === 'check_id') {
     $id_card = $_POST['id_card'] ?? '';
-    $stmt = $pdo->prepare("SELECT owner_name, house_number, owner_email FROM properties WHERE owner_id_card = ?");
-    $stmt->execute([$id_card]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    write_log("Iniciando 'check_id' para la cédula: '$id_card'");
 
-    if ($user) {
-        // Generar pista del correo: j****@g****.com
-        $email_parts = explode('@', $user['owner_email']);
-        $name = substr($email_parts[0], 0, 1) . str_repeat('*', strlen($email_parts[0]) - 1);
-        $domain_parts = explode('.', $email_parts[1]);
-        $domain = substr($domain_parts[0], 0, 1) . str_repeat('*', strlen($domain_parts[0]) - 1) . '.' . end($domain_parts);
-        
-        $response = [
-            'success' => true,
-            'data' => [
-                'name' => $user['owner_name'],
-                'house' => $user['house_number'],
-                'email_hint' => $name . '@' . $domain
-            ]
-        ];
-    } else {
-        $response['message'] = 'La cédula no se encuentra registrada.';
+    if (empty($id_card)) {
+        write_log("Error: La cédula está vacía.");
+        $response['message'] = 'Por favor, proporciona un número de cédula.';
+        echo json_encode($response);
+        exit;
     }
+
+    try {
+        write_log("Preparando la consulta a la base de datos.");
+        $stmt = $pdo->prepare("SELECT owner_name, house_number, owner_email FROM properties WHERE owner_id_card = ?");
+        write_log("Ejecutando la consulta.");
+        $stmt->execute([$id_card]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        write_log("Consulta ejecutada. Resultado: " . ($user ? "Usuario encontrado" : "Usuario NO encontrado"));
+
+        if ($user) {
+            $email_parts = explode('@', $user['owner_email']);
+            $name_part = substr($email_parts[0], 0, 1) . str_repeat('*', max(0, strlen($email_parts[0]) - 1));
+            $domain_parts = explode('.', $email_parts[1]);
+            $domain_name = substr($domain_parts[0], 0, 1) . str_repeat('*', max(0, strlen($domain_parts[0]) - 1));
+            $domain_ext = end($domain_parts);
+            $email_hint = "$name_part@$domain_name.$domain_ext";
+
+            $response = [
+                'success' => true,
+                'data' => [
+                    'name' => $user['owner_name'],
+                    'house' => $user['house_number'],
+                    'email_hint' => $email_hint
+                ]
+            ];
+            write_log("Datos del usuario preparados para la respuesta.");
+        } else {
+            $response['message'] = 'La cédula no se encuentra registrada.';
+            write_log("Respondiendo que la cédula no está registrada.");
+        }
+    } catch (PDOException $e) {
+        write_log("¡ERROR DE PDO! Mensaje: " . $e->getMessage());
+        $response['message'] = 'Error al consultar la base de datos.';
+    } catch (Exception $e) {
+        write_log("¡ERROR GENERAL! Mensaje: " . $e->getMessage());
+        $response['message'] = 'Ocurrió un error inesperado.';
+    }
+
 } elseif ($action === 'send_code') {
-    $id_card = $_POST['id_card'] ?? '';
-    // ... (Código para generar un código de 6 dígitos, guardarlo en la tabla `login_codes` con una expiración de 5 minutos y enviarlo por email usando la API de Brevo)
-    // $email = ... (obtener email de la BD con $id_card)
-    // send_login_code($email, $code); // Función que usa Brevo
-    $response = ['success' => true, 'message' => 'Se ha enviado un código a tu correo.'];
+    // ... (lógica futura)
+    write_log("Acción 'send_code' invocada.");
+    $response = ['success' => true, 'message' => 'Código enviado (simulado).'];
 
 } elseif ($action === 'verify_code') {
-    $id_card = $_POST['id_card'] ?? '';
-    $code = $_POST['code'] ?? '';
-    // ... (Código para verificar que el código existe, no ha expirado y corresponde al usuario)
-    // Si es válido:
-    // 1. Obtener datos del usuario desde la tabla `properties`
-    // 2. Iniciar sesión:
-    $_SESSION['user_id'] = $property['id'];
-    $_SESSION['user_name'] = $property['owner_name'];
-    // 3. Registrar la sesión en la tabla `user_sessions`
-    // 4. Devolver éxito
-    $response = ['success' => true, 'redirect' => 'meeting.php'];
+    // ... (lógica futura)
+    write_log("Acción 'verify_code' invocada.");
+    $response = ['success' => true, 'redirect' => 'meeting.php (simulado)'];
 }
 
+write_log("Respuesta final enviada: " . json_encode($response));
 echo json_encode($response);
 ?>

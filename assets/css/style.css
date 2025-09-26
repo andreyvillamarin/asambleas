@@ -1,17 +1,171 @@
 /* assets/css/style.css */
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; margin: 0; }
-.login-container, .poll-content { max-width: 400px; margin: 50px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-input[type="text"], input[type="password"] { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-button, .button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
-button:hover { background-color: #0056b3; }
-.hidden { display: none; }
-header { background: #fff; padding: 15px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-.logout-button { text-decoration: none; background: #dc3545; color: #fff; padding: 8px 15px; border-radius: 4px; }
-.dashboard { display: flex; gap: 20px; padding: 30px; }
-.quorum-display { flex-basis: 40%; text-align: center; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-.quorum-display .percentage { font-size: 4em; font-weight: bold; margin: 10px 0; }
-.quorum-display .status.no-quorum { color: #dc3545; font-weight: bold; }
-.quorum-display .status.has-quorum { color: #28a745; font-weight: bold; }
-.user-list { flex-basis: 60%; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-.poll-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.poll-option { display: block; margin-bottom: 10px; }
+
+/* --- Variables Globales --- */
+:root {
+    --primary-color: #0056b3; /* Un azul corporativo más moderno */
+    --primary-hover-color: #004494;
+    --secondary-color: #f8f9fa;
+    --font-color: #333;
+    --border-color: #ced4da;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --background-color: #eef2f5; /* Un fondo suave */
+    --container-background: #ffffff;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- Reseteo y Estilos Base --- */
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--font-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* --- Contenedor Principal del Login --- */
+.login-container {
+    background-color: var(--container-background);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.login-container h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.login-container h3 {
+    color: var(--font-color);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.login-container p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Estilos de Formularios --- */
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-align: left;
+    color: #495057;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+}
+
+button {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-bottom: 1rem;
+}
+
+button:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* --- Estilos de los Pasos --- */
+#step-2 p {
+    text-align: left;
+    margin-bottom: 0.8rem;
+}
+#step-2 p strong {
+    color: var(--font-color);
+}
+
+/* --- Mensajes de Error y Notificaciones --- */
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: none; /* Oculto por defecto */
+}
+
+/* --- Botones Secundarios y de Acción --- */
+#btn-reject-data {
+    background-color: #6c757d; /* Gris */
+}
+#btn-reject-data:hover {
+    background-color: #5a6268;
+}
+
+.whatsapp-button {
+    display: inline-block;
+    background-color: #25D366;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+.whatsapp-button:hover {
+    background-color: #1EBE57;
+}
+
+/* --- Clases de Utilidad --- */
+.hidden {
+    display: none;
+}
+
+/* --- Diseño Responsivo --- */
+@media (max-width: 500px) {
+    .login-container {
+        margin: 1rem;
+        padding: 1.5rem;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    body {
+        align-items: flex-start;
+    }
+}

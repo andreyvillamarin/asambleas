@@ -1,15 +1,28 @@
 <?php
 // includes/db.php
-require_once __DIR__ . '/../../../../config.php';
+// includes/db.php
+
+// La ruta correcta para acceder a config.php fuera de public_html
+$configPath = '/home/qdosnetw/config.php';
+
+if (!file_exists($configPath)) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Error cr赤tico: No se pudo encontrar el archivo de configuraci車n.']);
+    exit;
+}
+
+require_once $configPath;
 
 try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS);
-    // Configurar PDO para que lance excepciones en caso de error
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    // Emular consultas preparadas para mayor seguridad si la versi籀n de MySQL es antigua
     $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 } catch (PDOException $e) {
-    // En producci籀n, no muestres el error detallado. Reg穩stralo en un archivo de log.
-    die("Error de conexi籀n a la base de datos: " . $e->getMessage());
+    // En un entorno de producci車n, es mejor registrar este error que mostrarlo.
+    // error_log('Error de conexi車n a la base de datos: ' . $e->getMessage());
+    
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Error de conexi車n con la base de datos.']);
+    exit;
 }
 ?>
