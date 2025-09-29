@@ -50,16 +50,8 @@ if ($action === 'check_id') {
         write_log("Consulta ejecutada. Resultado: " . ($user ? "Usuario encontrado" : "Usuario NO encontrado"));
 
         if ($user) {
-            // --- Verificación de Sesión Activa ---
-            $stmt_session = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND status = 'connected'");
-            $stmt_session->execute([$user['id']]);
-            if ($stmt_session->fetch()) {
-                $response['message'] = 'Este usuario ya ha ingresado a la plataforma, no se permite más de una sesión por usuario.';
-                write_log("Acceso denegado: El usuario con cédula {$id_card} ya tiene una sesión activa.");
-                echo json_encode($response);
-                exit;
-            }
-            // --- Fin de Verificación ---
+            // La verificación de sesión activa se ha movido a la acción 'verify_code'
+            // para permitir que los usuarios desconectados se vuelvan a conectar.
 
             $email_parts = explode('@', $user['owner_email']);
             $name_part = substr($email_parts[0], 0, 1) . str_repeat('*', max(0, strlen($email_parts[0]) - 1));
@@ -178,6 +170,7 @@ if ($action === 'check_id') {
             // Iniciar sesión
             $_SESSION['user_id'] = $user_data['id']; // ID de la propiedad
             $_SESSION['logged_in'] = true;
+            $_SESSION['meeting_id'] = $active_meeting['id']; // ID de la reunión
 
             // Lógica de "Upsert" para la sesión del usuario
             $stmt_check = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND meeting_id = ?");

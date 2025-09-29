@@ -13,6 +13,21 @@ if (!$is_user && !$is_admin) {
     exit;
 }
 
+// Si es un usuario normal, verificar que su sesión esté 'conectada'.
+if ($is_user) {
+    $stmt_session = $pdo->prepare("SELECT status FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
+    $stmt_session->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
+    $session_status = $stmt_session->fetchColumn();
+
+    if ($session_status !== 'connected') {
+        // Si la sesión no está 'connected' (puede ser 'disconnected' o no existir),
+        // denegar el acceso. El cliente debe manejar este error y cerrar la sesión.
+        http_response_code(403);
+        echo json_encode(['error' => 'Sesión no válida o finalizada.']);
+        exit;
+    }
+}
+
 // Obtener la reunión activa (la última abierta)
 $stmt_meeting = $pdo->prepare("SELECT * FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
 $stmt_meeting->execute();

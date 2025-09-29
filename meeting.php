@@ -7,8 +7,20 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset(
     exit;
 }
 
-// 2. Obtener los datos del usuario para mostrarlos en la página.
 require_once 'includes/db.php'; // Incluir la conexión a la BD
+
+// 2. Verificación CRÍTICA: Asegurarse de que la sesión esté 'conectada' en la base de datos.
+// Esto previene que un usuario permanezca en la reunión si el admin lo ha desconectado.
+$stmt = $pdo->prepare("SELECT 1 FROM user_sessions WHERE property_id = ? AND meeting_id = ? AND status = 'connected'");
+$stmt->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
+if ($stmt->fetchColumn() === false) {
+    // Si la sesión no está activa ('connected') en la BD, destruir la sesión de PHP y redirigir.
+    session_destroy();
+    header("Location: index.php?message=session_expired");
+    exit;
+}
+
+// 3. Obtener los datos del usuario para mostrarlos en la página.
 $user_name = 'Usuario';
 $house_number = 'N/A';
 $coefficient = 'N/A';
@@ -158,6 +170,13 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
                 const response = await fetch(`api/real_time_data.php?t=${new Date().getTime()}`);
                 const data = await response.json();
 
+                if (data.status === 'disconnected') {
+                    // El servidor ha indicado que esta sesión ha sido desconectada. Forzar logout.
+                    alert('El administrador ha finalizado tu sesión.');
+                    window.location.href = 'logout.php';
+                    return; // Detener la ejecución para evitar más actualizaciones
+                }
+
                 if (data.error) {
                     console.error('Error al cargar datos del dashboard:', data.error);
                     return;
@@ -194,16 +213,18 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
                 // Actualizar el nuevo campo de contador de usuarios
                 document.getElementById('connected-users-count').textContent = data.users.connected_count;
 
-                // --- Verificación de Desconexión Forzada ---
+                // Verificación de Desconexión Forzada (Capa 2 de seguridad):
+                // Si el servidor responde correctamente (no hay error 403), aún verificamos
+                // si el usuario actual está en la lista de usuarios conectados.
                 const currentUserPropertyId = <?php echo $user_property_id_for_js; ?>;
-                const isCurrentUserConnected = data.users.list.some(user => user.property_id == currentUserPropertyId);
-                
-                if (!isCurrentUserConnected && timerInterval) { // timerInterval asegura que esto solo se ejecute si ya estaba en la reunión
-                    alert('El administrador ha finalizado tu sesión.');
-                    window.location.href = 'logout.php';
-                    return; // Detener la ejecución para evitar más actualizaciones
+                if (timerInterval) { // Solo ejecutar si la reunión ya ha comenzado.
+                    const isCurrentUserConnected = data.users.list.some(user => user.property_id == currentUserPropertyId);
+                    if (!isCurrentUserConnected) {
+                        alert('El administrador ha finalizado tu sesión.');
+                        window.location.href = 'logout.php';
+                        return;
+                    }
                 }
-                // --- Fin de la Verificación ---
 
                 const quorumStatusEl = document.getElementById('quorum-status');
                 if (data.quorum.has_quorum) {
@@ -245,6 +266,10 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
 
             } catch (error) {
                 console.error('Error fatal al actualizar el dashboard del usuario:', error);
+                // Si hay un error de red o un error 403 (sesión inválida),
+                // es más seguro redirigir al logout para evitar un estado inconsistente.
+                alert('Se ha perdido la conexión con la reunión. Serás redirigido a la página de inicio.');
+                window.location.href = 'logout.php';
             }
         }
     </script>

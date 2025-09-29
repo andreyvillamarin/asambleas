@@ -29,9 +29,9 @@ try {
         $response = ['success' => true, 'message' => 'Reunión cerrada.'];
     }
     elseif ($action === 'disconnect_all' && $meeting_id) {
-        // Eliminar todas las sesiones de la reunión, pero no cerrar la reunión en sí.
-        $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
-        $stmt_delete->execute([$meeting_id]);
+        // Marcar todas las sesiones de la reunión como 'disconnected' en lugar de borrarlas.
+        $stmt_update = $pdo->prepare("UPDATE user_sessions SET status = 'disconnected' WHERE meeting_id = ?");
+        $stmt_update->execute([$meeting_id]);
         
         $response = ['success' => true, 'message' => 'Todos los usuarios han sido desconectados.'];
     }
