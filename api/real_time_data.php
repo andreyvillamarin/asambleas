@@ -20,10 +20,10 @@ if ($is_user) {
     $session_status = $stmt_session->fetchColumn();
 
     if ($session_status !== 'connected') {
-        // Si la sesión no está 'connected' (puede ser 'disconnected' o no existir),
-        // denegar el acceso. El cliente debe manejar este error y cerrar la sesión.
-        http_response_code(403);
-        echo json_encode(['error' => 'Sesión no válida o finalizada.']);
+        // Si la sesión no está 'connected' (p. ej., 'disconnected'), enviar una respuesta
+        // específica que el cliente pueda interpretar para forzar el cierre de sesión.
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'disconnected']);
         exit;
     }
 }
