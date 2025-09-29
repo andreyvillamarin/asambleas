@@ -11,9 +11,14 @@ $poll_id = $_POST['poll_id'] ?? null;
 
 try {
     if ($action === 'open_meeting' && $meeting_id) {
-        // Asegurarse que no haya otra reunión abierta
+        // 1. Desconectar a todos los usuarios de la sesión anterior de esta reunión para reiniciar el temporizador.
+        $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
+        $stmt_delete->execute([$meeting_id]);
+
+        // 2. Asegurarse que no haya otra reunión abierta
         $pdo->exec("UPDATE meetings SET status = 'closed' WHERE status = 'opened'");
-        // Abrir la nueva
+        
+        // 3. Abrir la nueva
         $stmt = $pdo->prepare("UPDATE meetings SET status = 'opened' WHERE id = ?");
         $stmt->execute([$meeting_id]);
         $response = ['success' => true, 'message' => 'Reunión abierta correctamente.'];
@@ -21,14 +26,13 @@ try {
     elseif ($action === 'close_meeting' && $meeting_id) {
         $stmt = $pdo->prepare("UPDATE meetings SET status = 'closed' WHERE id = ?");
         $stmt->execute([$meeting_id]);
-        // Opcional: Desconectar a todos los usuarios al cerrar
-        $stmt_disconnect = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
-        $stmt_disconnect->execute([$meeting_id]);
         $response = ['success' => true, 'message' => 'Reunión cerrada.'];
     }
     elseif ($action === 'disconnect_all' && $meeting_id) {
-        $stmt = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
-        $stmt->execute([$meeting_id]);
+        // Eliminar todas las sesiones de la reunión, pero no cerrar la reunión en sí.
+        $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
+        $stmt_delete->execute([$meeting_id]);
+        
         $response = ['success' => true, 'message' => 'Todos los usuarios han sido desconectados.'];
     }
     elseif ($action === 'open_poll' && $poll_id) {

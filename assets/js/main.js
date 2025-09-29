@@ -157,10 +157,28 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 4. Rechazar Datos
     if (btnRejectData) {
-        btnRejectData.addEventListener('click', () => {
+        btnRejectData.addEventListener('click', async () => {
             showStep(1); // Vuelve al paso 1
-            whatsappContact.classList.remove('hidden');
             showError("Por favor, contacta al administrador para corregir tus datos.");
+
+            try {
+                // Obtener el número de WhatsApp desde la API
+                const response = await fetch('/demos/asambleas/api/get_setting.php?key=admin_whatsapp');
+                const result = await response.json();
+
+                if (result.success && result.value) {
+                    const whatsappLink = whatsappContact.querySelector('a');
+                    // Limpiar el número de caracteres no numéricos, excepto el '+' inicial
+                    const cleanNumber = result.value.replace(/[^0-9+]/g, '');
+                    whatsappLink.href = `https://wa.me/${cleanNumber}`;
+                    whatsappContact.classList.remove('hidden');
+                } else {
+                    // Si no hay número, el botón de WhatsApp permanece oculto.
+                    console.warn('No se pudo obtener el número de WhatsApp del administrador.');
+                }
+            } catch (error) {
+                console.error('Error al obtener la configuración de WhatsApp:', error);
+            }
         });
     }
 });

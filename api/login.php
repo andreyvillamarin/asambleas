@@ -43,13 +43,24 @@ if ($action === 'check_id') {
 
     try {
         write_log("Preparando la consulta a la base de datos.");
-        $stmt = $pdo->prepare("SELECT owner_name, house_number, owner_email FROM properties WHERE owner_id_card = ?");
+        $stmt = $pdo->prepare("SELECT id, owner_name, house_number, owner_email FROM properties WHERE owner_id_card = ?");
         write_log("Ejecutando la consulta.");
         $stmt->execute([$id_card]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         write_log("Consulta ejecutada. Resultado: " . ($user ? "Usuario encontrado" : "Usuario NO encontrado"));
 
         if ($user) {
+            // --- Verificación de Sesión Activa ---
+            $stmt_session = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND status = 'connected'");
+            $stmt_session->execute([$user['id']]);
+            if ($stmt_session->fetch()) {
+                $response['message'] = 'Este usuario ya ha ingresado a la plataforma, no se permite más de una sesión por usuario.';
+                write_log("Acceso denegado: El usuario con cédula {$id_card} ya tiene una sesión activa.");
+                echo json_encode($response);
+                exit;
+            }
+            // --- Fin de Verificación ---
+
             $email_parts = explode('@', $user['owner_email']);
             $name_part = substr($email_parts[0], 0, 1) . str_repeat('*', max(0, strlen($email_parts[0]) - 1));
             $domain_parts = explode('.', $email_parts[1]);
@@ -136,8 +147,8 @@ if ($action === 'check_id') {
     }
 
     try {
-        // Obtener el código y la fecha de expiración de la base de datos
-        $stmt = $pdo->prepare("SELECT login_code, login_code_expires_at FROM properties WHERE owner_id_card = ?");
+        // Obtener el código, la fecha de expiración y el ID de la propiedad
+        $stmt = $pdo->prepare("SELECT id, login_code, login_code_expires_at FROM properties WHERE owner_id_card = ?");
         $stmt->execute([$id_card]);
         $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -153,13 +164,39 @@ if ($action === 'check_id') {
         
         // Verificar si el código es correcto y no ha expirado
         if ($stored_code === $code && (new DateTime() < new DateTime($expires_at_str))) {
-            // El código es válido. Iniciar sesión.
-            $_SESSION['user_id_card'] = $id_card;
+            // El código es válido. Obtener la reunión activa.
+            $stmt_meeting = $pdo->prepare("SELECT id FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
+            $stmt_meeting->execute();
+            $active_meeting = $stmt_meeting->fetch(PDO::FETCH_ASSOC);
+
+            if (!$active_meeting) {
+                $response['message'] = 'No hay ninguna reunión activa en este momento. Por favor, inténtalo más tarde.';
+                echo json_encode($response);
+                exit;
+            }
+
+            // Iniciar sesión
+            $_SESSION['user_id'] = $user_data['id']; // ID de la propiedad
             $_SESSION['logged_in'] = true;
+
+            // Lógica de "Upsert" para la sesión del usuario
+            $stmt_check = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
+            $stmt_check->execute([$user_data['id'], $active_meeting['id']]);
+            $existing_session_id = $stmt_check->fetchColumn();
+
+            if ($existing_session_id) {
+                // Si ya existe, actualizarla (re-conectar)
+                $stmt_upsert = $pdo->prepare("UPDATE user_sessions SET status = 'connected', login_time = NOW(), logout_time = NULL WHERE id = ?");
+                $stmt_upsert->execute([$existing_session_id]);
+            } else {
+                // Si no existe, insertarla
+                $stmt_upsert = $pdo->prepare("INSERT INTO user_sessions (property_id, meeting_id, status, login_time) VALUES (?, ?, 'connected', NOW())");
+                $stmt_upsert->execute([$user_data['id'], $active_meeting['id']]);
+            }
             
             // Limpiar el código de la base de datos después de usarlo
-            $stmt = $pdo->prepare("UPDATE properties SET login_code = NULL, login_code_expires_at = NULL WHERE owner_id_card = ?");
-            $stmt->execute([$id_card]);
+            $stmt_clean = $pdo->prepare("UPDATE properties SET login_code = NULL, login_code_expires_at = NULL WHERE owner_id_card = ?");
+            $stmt_clean->execute([$id_card]);
 
             write_log("Verificación exitosa para la cédula {$id_card}. Redirigiendo a meeting.php.");
             $response = [

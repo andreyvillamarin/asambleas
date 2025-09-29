@@ -56,79 +56,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 $properties = $pdo->query("SELECT * FROM properties ORDER BY house_number ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<h2>Gestión de Propiedades</h2>
+<?php if ($success_msg): ?><div class="alert alert-success"><?php echo $success_msg; ?></div><?php endif; ?>
+<?php if ($error_msg): ?><div class="alert alert-danger"><?php echo $error_msg; ?></div><?php endif; ?>
 
-<?php if ($success_msg): ?><div class="message success"><?php echo $success_msg; ?></div><?php endif; ?>
-<?php if ($error_msg): ?><div class="message error"><?php echo $error_msg; ?></div><?php endif; ?>
-
-
-<div class="form-container">
-    <h3>Añadir Nueva Propiedad</h3>
-    <form method="post">
-        <input type="text" name="house_number" placeholder="Número de Casa/Apto" required>
-        <input type="text" name="coefficient" placeholder="Coeficiente (ej: 0.12345)" required>
-        <input type="text" name="owner_id_card" placeholder="Cédula Propietario" required>
-        <input type="text" name="owner_name" placeholder="Nombre Propietario" required>
-        <input type="email" name="owner_email" placeholder="Correo Propietario" required>
-        <button type="submit" name="add_property">Añadir Propiedad</button>
-    </form>
-</div>
-
-
-<div class="data-actions">
-    <div class="import-csv">
-        <h3>Importar desde CSV</h3>
-        <p>El archivo debe tener las columnas: house_number, coefficient, owner_id_card, owner_name, owner_email</p>
-        <form method="post" enctype="multipart/form-data">
-            <input type="file" name="csv_file" accept=".csv" required>
-            <button type="submit">Importar</button>
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-plus-circle"></i> Añadir Nueva Propiedad</h2>
+    </div>
+    <div class="card-body">
+        <form method="post" class="form-container">
+            <label for="house_number">Número de Casa/Apto:</label>
+            <input type="text" id="house_number" name="house_number" required>
+            <label for="coefficient">Coeficiente (ej: 0.12345):</label>
+            <input type="text" id="coefficient" name="coefficient" required>
+            <label for="owner_id_card">Cédula Propietario:</label>
+            <input type="text" id="owner_id_card" name="owner_id_card" required>
+            <label for="owner_name">Nombre Propietario:</label>
+            <input type="text" id="owner_name" name="owner_name" required>
+            <label for="owner_email">Correo Propietario:</label>
+            <input type="email" id="owner_email" name="owner_email" required>
+            <button type="submit" name="add_property" class="btn btn-success"><i class="fas fa-plus"></i> Añadir Propiedad</button>
         </form>
     </div>
-    <div class="export-csv">
-        <h3>Exportar a CSV</h3>
-        <a href="export_properties.php" class="button">Descargar CSV</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-file-import"></i> Importar / <i class="fas fa-file-export"></i> Exportar</h2>
+    </div>
+    <div class="card-body data-actions">
+        <div class="import-csv">
+            <h4>Importar desde CSV</h4>
+            <p>El archivo debe tener las columnas: house_number, coefficient, owner_id_card, owner_name, owner_email</p>
+            <form method="post" enctype="multipart/form-data">
+                <input type="file" name="csv_file" accept=".csv" required>
+                <button type="submit" class="btn"><i class="fas fa-upload"></i> Importar</button>
+            </form>
+        </div>
+        <div class="export-csv">
+            <h4>Exportar a CSV</h4>
+            <a href="export_properties.php" class="btn btn-secondary"><i class="fas fa-download"></i> Descargar CSV</a>
+        </div>
     </div>
 </div>
 
-
-<div class="data-table">
-    <h3>Listado de Propiedades</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Casa/Apto</th>
-                <th>Coeficiente</th>
-                <th>Cédula</th>
-                <th>Propietario</th>
-                <th>Email</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($properties)): ?>
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-list"></i> Listado de Propiedades</h2>
+    </div>
+    <div class="card-body">
+        <table>
+            <thead>
                 <tr>
-                    <td colspan="6" style="text-align:center;">No hay propiedades registradas.</td>
+                    <th>Casa/Apto</th>
+                    <th>Coeficiente</th>
+                    <th>Cédula</th>
+                    <th>Propietario</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($properties as $prop): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($prop['house_number']); ?></td>
-                    <td><?php echo htmlspecialchars($prop['coefficient']); ?></td>
-                    <td><?php echo htmlspecialchars($prop['owner_id_card']); ?></td>
-                    <td><?php echo htmlspecialchars($prop['owner_name']); ?></td>
-                    <td><?php echo htmlspecialchars($prop['owner_email']); ?></td>
-                    <td class="actions">
-                        <a href="edit_property.php?id=<?php echo $prop['id']; ?>" class="button">Editar</a>
-                        <form method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres borrar esta propiedad?');">
-                            <input type="hidden" name="property_id" value="<?php echo $prop['id']; ?>">
-                            <button type="submit" name="delete_property" class="danger">Borrar</button>
-                        </form>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (empty($properties)): ?>
+                    <tr>
+                        <td colspan="6" style="text-align:center;">No hay propiedades registradas.</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($properties as $prop): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($prop['house_number']); ?></td>
+                        <td><?php echo htmlspecialchars($prop['coefficient']); ?></td>
+                        <td><?php echo htmlspecialchars($prop['owner_id_card']); ?></td>
+                        <td><?php echo htmlspecialchars($prop['owner_name']); ?></td>
+                        <td><?php echo htmlspecialchars($prop['owner_email']); ?></td>
+                        <td class="action-buttons">
+                            <a href="edit_property.php?id=<?php echo $prop['id']; ?>" class="btn"><i class="fas fa-edit"></i> Editar</a>
+                            <form method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres borrar esta propiedad?');">
+                                <input type="hidden" name="property_id" value="<?php echo $prop['id']; ?>">
+                                <button type="submit" name="delete_property" class="btn btn-danger"><i class="fas fa-trash"></i> Borrar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

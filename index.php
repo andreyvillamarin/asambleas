@@ -14,7 +14,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingreso a la Asamblea</title>
     <link rel="stylesheet" href="https://qdos.network/demos/asambleas/assets/css/style.css">
-    <link rel="icon" href="https://qdos.network/demos/asambleas/assets/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="assets/favicon.png" type="image/png">
 </head>
 <body>
     <div id="login-container" class="login-container">
