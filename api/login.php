@@ -164,13 +164,13 @@ if ($action === 'check_id') {
         
         // Verificar si el código es correcto y no ha expirado
         if ($stored_code === $code && (new DateTime() < new DateTime($expires_at_str))) {
-            // El código es válido. Obtener la reunión activa.
-            $stmt_meeting = $pdo->prepare("SELECT id FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
+            // El código es válido. Obtener la reunión activa o la próxima a iniciar.
+            $stmt_meeting = $pdo->prepare("SELECT id FROM meetings WHERE status IN ('opened', 'created') ORDER BY meeting_date DESC, id DESC LIMIT 1");
             $stmt_meeting->execute();
             $active_meeting = $stmt_meeting->fetch(PDO::FETCH_ASSOC);
 
             if (!$active_meeting) {
-                $response['message'] = 'No hay ninguna reunión activa en este momento. Por favor, inténtalo más tarde.';
+                $response['message'] = 'No hay ninguna reunión programada en este momento. Por favor, inténtalo más tarde.';
                 echo json_encode($response);
                 exit;
             }

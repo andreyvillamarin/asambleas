@@ -121,6 +121,7 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
                 const data = await response.json();
 
                 if (data.status === 'opened') {
+                    // La reunión está activa, mostrar la vista principal.
                     if (waitingRoom.style.display !== 'none') {
                         waitingRoom.style.display = 'none';
                         meetingView.style.display = 'block';
@@ -128,22 +129,20 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
                         setInterval(updateUserDashboard, 5000);
                         updateUserDashboard();
                     }
+                } else if (data.status === 'created') {
+                    // La reunión está creada pero no iniciada, mantener en sala de espera.
+                    waitingRoom.style.display = 'block';
+                    meetingView.style.display = 'none';
                 } else {
-                    // Si el usuario estaba en la reunión y esta se cerró, forzar el logout.
-                    if (meetingView.style.display === 'block') {
-                        alert('La reunión ha finalizado. Serás redirigido a la página de inicio.');
-                        window.location.href = 'logout.php';
-                    } else {
-                        // Si el usuario estaba en la sala de espera, mantenerlo ahí.
-                        waitingRoom.style.display = 'block';
-                        meetingView.style.display = 'none';
-                    }
+                    // Para cualquier otro estado (ej. 'closed', null), la sesión ya no es válida.
+                    alert('La reunión ha finalizado o ya no se encuentra disponible. Serás redirigido a la página de inicio.');
+                    window.location.href = 'logout.php';
                 }
             } catch (error) {
                 console.error('Error al verificar el estado de la reunión:', error);
-                // Mantener la vista de espera en caso de error para evitar una pantalla en blanco
-                waitingRoom.style.display = 'block';
-                meetingView.style.display = 'none';
+                // En caso de un error de red, es más seguro redirigir para evitar estados inconsistentes.
+                alert('Se perdió la conexión con el servidor. Serás redirigido a la página de inicio.');
+                window.location.href = 'logout.php';
             }
         }
 
