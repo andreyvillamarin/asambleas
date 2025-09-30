@@ -14,14 +14,15 @@ if (!$is_user && !$is_admin) {
 }
 
 // Si es un usuario normal, verificar que su sesión esté 'conectada'.
+// Esta es la corrección CRÍTICA.
 if ($is_user) {
     $stmt_session = $pdo->prepare("SELECT status FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
     $stmt_session->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
     $session_status = $stmt_session->fetchColumn();
 
     if ($session_status !== 'connected') {
-        // Si la sesión no está 'connected' (p. ej., 'disconnected'), enviar una respuesta
-        // específica que el cliente pueda interpretar para forzar el cierre de sesión.
+        // Si la sesión no está 'connected' (p. ej., 'disconnected' por el admin),
+        // enviar una respuesta específica que el cliente pueda interpretar para forzar el logout.
         header('Content-Type: application/json');
         echo json_encode(['status' => 'disconnected']);
         exit;
@@ -41,6 +42,7 @@ if (!$meeting) {
 // 1. Calcular el coeficiente total correctamente, incluyendo los poderes.
 
 // Primero, obtener los IDs de las propiedades de los asistentes conectados.
+// Se añade "AND status = 'connected'" para asegurar que solo contamos a los activos.
 $stmt_attendees = $pdo->prepare("SELECT property_id FROM user_sessions WHERE meeting_id = ? AND status = 'connected'");
 $stmt_attendees->execute([$meeting['id']]);
 $attendee_property_ids = $stmt_attendees->fetchAll(PDO::FETCH_COLUMN);
@@ -81,6 +83,7 @@ $total_coefficient = $total_coefficient_query->fetchColumn();
 $quorum_percentage = ($total_coefficient > 0) ? ($current_coefficient_sum / $total_coefficient) * 100 : 0;
 
 // 4. Obtener lista de usuarios conectados, incluyendo información de poderes recibidos
+// Se añade "AND us.status = 'connected'" en el WHERE para asegurar que solo listamos usuarios activos.
 $stmt_users = $pdo->prepare(
     "SELECT 
         p.id AS property_id,

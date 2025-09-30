@@ -778,3 +778,81 @@
 [2025-09-29 06:18:53] Iniciando 'verify_code' para la cédula: '7701810' con el código: '414216'
 [2025-09-29 06:18:53] Verificación exitosa para la cédula 7701810. Redirigiendo a meeting.php.
 [2025-09-29 06:18:53] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-09-29 07:21:19] --- Nueva solicitud a login.php ---
+[2025-09-29 07:21:19] Dependencias cargadas correctamente.
+[2025-09-29 07:21:19] Acción recibida: 'check_id'
+[2025-09-29 07:21:19] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-29 07:21:19] Preparando la consulta a la base de datos.
+[2025-09-29 07:21:19] Ejecutando la consulta.
+[2025-09-29 07:21:19] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-29 07:21:19] Datos del usuario preparados para la respuesta.
+[2025-09-29 07:21:19] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-29 07:21:20] --- Nueva solicitud a login.php ---
+[2025-09-29 07:21:20] Dependencias cargadas correctamente.
+[2025-09-29 07:21:20] Acción recibida: 'send_code'
+[2025-09-29 07:21:20] Iniciando 'send_code' para la cédula: '55167759'
+[2025-09-29 07:21:20] Código generado (676768) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-09-29 07:21:20] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-09-29 07:21:20] API Key obtenida correctamente.
+[2025-09-29 07:21:20] Cliente de la API de Sendinblue configurado.
+[2025-09-29 07:21:20] Objeto de email creado. Listo para enviar.
+[2025-09-29 07:21:21] Llamada a sendTransacEmail completada exitosamente para andreyvillamarin@gmail.com.
+[2025-09-29 07:21:21] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-29 07:21:31] --- Nueva solicitud a login.php ---
+[2025-09-29 07:21:31] Dependencias cargadas correctamente.
+[2025-09-29 07:21:31] Acción recibida: 'verify_code'
+[2025-09-29 07:21:31] Iniciando 'verify_code' para la cédula: '55167759' con el código: '676768'
+[2025-09-29 07:21:31] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-09-29 07:21:31] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-09-29 07:21:48] --- Nueva solicitud a login.php ---
+[2025-09-29 07:21:48] Dependencias cargadas correctamente.
+[2025-09-29 07:21:48] Acción recibida: 'check_id'
+[2025-09-29 07:21:48] Iniciando 'check_id' para la cédula: '7701810'
+[2025-09-29 07:21:48] Preparando la consulta a la base de datos.
+[2025-09-29 07:21:48] Ejecutando la consulta.
+[2025-09-29 07:21:48] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-29 07:21:48] Datos del usuario preparados para la respuesta.
+[2025-09-29 07:21:48] Respuesta final enviada: {"success":true,"data":{"name":"Andrey Villamarin","house":"2B4","email_hint":"a***********@g****.com"}}
+[2025-09-29 07:21:49] --- Nueva solicitud a login.php ---
+[2025-09-29 07:21:49] Dependencias cargadas correctamente.
+[2025-09-29 07:21:49] Acción recibida: 'send_code'
+[2025-09-29 07:21:49] Iniciando 'send_code' para la cédula: '7701810'
+[2025-09-29 07:21:49] Código generado (293018) para aavillamarin@gmail.com. Intentando enviar email...
+[2025-09-29 07:21:49] Iniciando send_login_code para aavillamarin@gmail.com.
+[2025-09-29 07:21:49] API Key obtenida correctamente.
+[2025-09-29 07:21:49] Cliente de la API de Sendinblue configurado.
+[2025-09-29 07:21:49] Objeto de email creado. Listo para enviar.
+[2025-09-29 07:21:50] Llamada a sendTransacEmail completada exitosamente para aavillamarin@gmail.com.
+[2025-09-29 07:21:50] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-29 07:22:03] --- Nueva solicitud a login.php ---
+[2025-09-29 07:22:03] Dependencias cargadas correctamente.
+[2025-09-29 07:22:03] Acción recibida: 'verify_code'
+[2025-09-29 07:22:03] Iniciando 'verify_code' para la cédula: '7701810' con el código: '293018'
+[2025-09-29 07:22:03] Verificación exitosa para la cédula 7701810. Redirigiendo a meeting.php.
+[2025-09-29 07:22:03] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-09-30 06:30:17] --- Nueva solicitud a login.php ---
+[2025-09-30 06:30:17] Dependencias cargadas correctamente.
+[2025-09-30 06:30:17] Acción recibida: 'check_id'
+[2025-09-30 06:30:17] Iniciando 'check_id' para la cédula: '7701810'
+[2025-09-30 06:30:17] Preparando la consulta a la base de datos.
+[2025-09-30 06:30:17] Ejecutando la consulta.
+[2025-09-30 06:30:17] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-30 06:30:17] Datos del usuario preparados para la respuesta.
+[2025-09-30 06:30:17] Respuesta final enviada: {"success":true,"data":{"name":"Andrey Villamarin","house":"2B4","email_hint":"a***********@g****.com"}}
+[2025-09-30 06:30:19] --- Nueva solicitud a login.php ---
+[2025-09-30 06:30:19] Dependencias cargadas correctamente.
+[2025-09-30 06:30:19] Acción recibida: 'send_code'
+[2025-09-30 06:30:19] Iniciando 'send_code' para la cédula: '7701810'
+[2025-09-30 06:30:19] Código generado (417571) para aavillamarin@gmail.com. Intentando enviar email...
+[2025-09-30 06:30:19] Iniciando send_login_code para aavillamarin@gmail.com.
+[2025-09-30 06:30:19] API Key obtenida correctamente.
+[2025-09-30 06:30:19] Cliente de la API de Sendinblue configurado.
+[2025-09-30 06:30:19] Objeto de email creado. Listo para enviar.
+[2025-09-30 06:30:20] Llamada a sendTransacEmail completada exitosamente para aavillamarin@gmail.com.
+[2025-09-30 06:30:20] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-30 06:30:39] --- Nueva solicitud a login.php ---
+[2025-09-30 06:30:39] Dependencias cargadas correctamente.
+[2025-09-30 06:30:39] Acción recibida: 'verify_code'
+[2025-09-30 06:30:39] Iniciando 'verify_code' para la cédula: '7701810' con el código: '417571'
+[2025-09-30 06:30:39] Verificación exitosa para la cédula 7701810. Redirigiendo a meeting.php.
+[2025-09-30 06:30:39] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}

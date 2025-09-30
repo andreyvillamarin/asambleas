@@ -1,6 +1,5 @@
 <?php
 // admin/includes/header.php
-session_start();
 require_once __DIR__ . '/../../includes/db.php'; // Conexión a la BD
 require_once __DIR__ . '/auth_check.php'; // Verificar si el usuario está logueado
 ?>

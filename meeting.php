@@ -2,6 +2,7 @@
 session_start();
 
 // 1. Verificar que el usuario tenga una sesión completamente válida.
+// CORRECCIÓN: Se usa 'user_id' que es la variable correcta establecida en el login, no 'property_id'.
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
@@ -11,12 +12,26 @@ require_once 'includes/db.php'; // Incluir la conexión a la BD
 
 // 2. Verificación CRÍTICA: Asegurarse de que la sesión esté 'conectada' en la base de datos.
 // Esto previene que un usuario permanezca en la reunión si el admin lo ha desconectado.
-$stmt = $pdo->prepare("SELECT 1 FROM user_sessions WHERE property_id = ? AND meeting_id = ? AND status = 'connected'");
-$stmt->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
-if ($stmt->fetchColumn() === false) {
-    // Si la sesión no está activa ('connected') en la BD, destruir la sesión de PHP y redirigir.
+$user_id = $_SESSION['user_id'];
+$meeting_id = $_SESSION['meeting_id'];
+
+try {
+    // CORRECCIÓN: Se consulta la tabla 'user_sessions' con 'property_id', que corresponde a 'user_id' en la sesión.
+    $stmt = $pdo->prepare("SELECT status FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
+    $stmt->execute([$user_id, $meeting_id]);
+    $session_status = $stmt->fetchColumn();
+
+    if ($session_status !== 'connected') {
+        // Si la sesión no está activa ('connected') en la BD, destruir la sesión de PHP y redirigir.
+        session_destroy();
+        header("Location: index.php?message=session_expired");
+        exit;
+    }
+
+} catch (PDOException $e) {
+    // En caso de error de BD, es más seguro cerrar la sesión.
     session_destroy();
-    header("Location: index.php?message=session_expired");
+    header("Location: index.php?message=db_error");
     exit;
 }
 
@@ -25,17 +40,17 @@ $user_name = 'Usuario';
 $house_number = 'N/A';
 $coefficient = 'N/A';
 
-if (isset($_SESSION['user_id'])) { // Usar user_id (ID de la propiedad) que se establece en el login
-    $stmt = $pdo->prepare("SELECT owner_name, house_number, coefficient FROM properties WHERE id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($user) {
-        $user_name = $user['owner_name'];
-        $house_number = $user['house_number'];
-        $coefficient = $user['coefficient'];
-    }
+// Usar el user_id de la sesión (que es el ID de la propiedad).
+$stmt_user = $pdo->prepare("SELECT owner_name, house_number, coefficient FROM properties WHERE id = ?");
+$stmt_user->execute([$user_id]);
+$user = $stmt_user->fetch(PDO::FETCH_ASSOC);
+if ($user) {
+    $user_name = $user['owner_name'];
+    $house_number = $user['house_number'];
+    $coefficient = $user['coefficient'];
 }
-$user_property_id_for_js = $_SESSION['user_id'] ?? 0;
+
+$user_property_id_for_js = $user_id;
 ?>
 <!DOCTYPE html>
 <html lang="es">
