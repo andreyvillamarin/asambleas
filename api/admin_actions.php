@@ -29,7 +29,12 @@ try {
         $response = ['success' => true, 'message' => 'Reunión cerrada.'];
     }
     elseif ($action === 'disconnect_all' && $meeting_id) {
-        // Marcar todas las sesiones de la reunión como 'disconnected' en lugar de borrarlas.
+        // 1. Poner un timestamp para forzar la desconexión.
+        // Se usará `force_logout_timestamp` para invalidar sesiones de usuario.
+        $stmt_force_logout = $pdo->prepare("UPDATE meetings SET force_logout_timestamp = NOW() WHERE id = ?");
+        $stmt_force_logout->execute([$meeting_id]);
+
+        // 2. Marcar todas las sesiones de la reunión como 'disconnected' en lugar de borrarlas.
         $stmt_update = $pdo->prepare("UPDATE user_sessions SET status = 'disconnected' WHERE meeting_id = ?");
         $stmt_update->execute([$meeting_id]);
         
@@ -62,3 +67,4 @@ try {
 }
 
 echo json_encode($response);
+?>

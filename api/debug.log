@@ -856,3 +856,29 @@
 [2025-09-30 06:30:39] Iniciando 'verify_code' para la cédula: '7701810' con el código: '417571'
 [2025-09-30 06:30:39] Verificación exitosa para la cédula 7701810. Redirigiendo a meeting.php.
 [2025-09-30 06:30:39] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-09-30 08:01:43] --- Nueva solicitud a login.php ---
+[2025-09-30 08:01:43] Dependencias cargadas correctamente.
+[2025-09-30 08:01:43] Acción recibida: 'check_id'
+[2025-09-30 08:01:43] Iniciando 'check_id' para la cédula: '55167759'
+[2025-09-30 08:01:43] Preparando la consulta a la base de datos.
+[2025-09-30 08:01:43] Ejecutando la consulta.
+[2025-09-30 08:01:43] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-09-30 08:01:43] Datos del usuario preparados para la respuesta.
+[2025-09-30 08:01:43] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-09-30 08:01:44] --- Nueva solicitud a login.php ---
+[2025-09-30 08:01:44] Dependencias cargadas correctamente.
+[2025-09-30 08:01:44] Acción recibida: 'send_code'
+[2025-09-30 08:01:44] Iniciando 'send_code' para la cédula: '55167759'
+[2025-09-30 08:01:44] Código generado (641032) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-09-30 08:01:44] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-09-30 08:01:44] API Key obtenida correctamente.
+[2025-09-30 08:01:44] Cliente de la API de Sendinblue configurado.
+[2025-09-30 08:01:44] Objeto de email creado. Listo para enviar.
+[2025-09-30 08:01:44] Llamada a sendTransacEmail completada exitosamente para andreyvillamarin@gmail.com.
+[2025-09-30 08:01:44] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-09-30 08:02:11] --- Nueva solicitud a login.php ---
+[2025-09-30 08:02:11] Dependencias cargadas correctamente.
+[2025-09-30 08:02:11] Acción recibida: 'verify_code'
+[2025-09-30 08:02:11] Iniciando 'verify_code' para la cédula: '55167759' con el código: '641032'
+[2025-09-30 08:02:11] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-09-30 08:02:11] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}

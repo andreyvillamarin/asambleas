@@ -13,16 +13,44 @@ if (!$is_user && !$is_admin) {
     exit;
 }
 
-// Si es un usuario normal, verificar que su sesión esté 'conectada'.
-// Esta es la corrección CRÍTICA.
+// Si es un usuario normal, verificar que su sesión siga siendo válida.
 if ($is_user) {
-    $stmt_session = $pdo->prepare("SELECT status FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
+    // Esta consulta es CRÍTICA. Verifica dos cosas:
+    // 1. Si la sesión del usuario individualmente ha sido marcada como 'disconnected'.
+    // 2. Si el administrador ha forzado una desconexión de TODOS los usuarios después de que este usuario iniciara sesión.
+    $stmt_session = $pdo->prepare(
+        "SELECT 
+            us.status,
+            us.login_time,
+            m.force_logout_timestamp
+         FROM user_sessions us
+         JOIN meetings m ON us.meeting_id = m.id
+         WHERE us.property_id = ? AND us.meeting_id = ?"
+    );
     $stmt_session->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
-    $session_status = $stmt_session->fetchColumn();
+    $session_info = $stmt_session->fetch(PDO::FETCH_ASSOC);
 
-    if ($session_status !== 'connected') {
-        // Si la sesión no está 'connected' (p. ej., 'disconnected' por el admin),
-        // enviar una respuesta específica que el cliente pueda interpretar para forzar el logout.
+    $force_logout = false;
+    if ($session_info) {
+        if ($session_info['status'] !== 'connected') {
+            $force_logout = true;
+        }
+        
+        // Comprobar si el timestamp de forzar logout es más reciente que el de login del usuario.
+        if ($session_info['force_logout_timestamp'] && $session_info['login_time']) {
+            $force_logout_time = new DateTime($session_info['force_logout_timestamp']);
+            $login_time = new DateTime($session_info['login_time']);
+            if ($force_logout_time > $login_time) {
+                $force_logout = true;
+            }
+        }
+    } else {
+        // Si no hay información de sesión, forzar logout por seguridad.
+        $force_logout = true;
+    }
+
+    if ($force_logout) {
+        // Enviar una respuesta específica que el cliente pueda interpretar para forzar el logout.
         header('Content-Type: application/json');
         echo json_encode(['status' => 'disconnected']);
         exit;
