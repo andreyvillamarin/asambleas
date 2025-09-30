@@ -3,20 +3,20 @@ header('Content-Type: application/json');
 session_start();
 require_once '../includes/db.php';
 
-// Asegurarse de que el usuario est¨¦ logueado para consultar el estado
+// Asegurarse de que el usuario estï¿½ï¿½esta logueado para consultar el estado
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
 
 try {
-    // Consultar si hay alguna reuni¨®n con estado 'opened'
+    // Consultar si hay alguna reunion con estado 'opened'
     $stmt = $pdo->prepare("SELECT status FROM meetings WHERE status = 'opened' LIMIT 1");
     $stmt->execute();
     $meeting = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($meeting) {
-        // Si se encuentra una reuni¨®n abierta, devolver 'opened'
+        // Si se encuentra una reunion abierta, devolver 'opened'
         echo json_encode(['status' => 'opened']);
     } else {
         // Si no, devolver 'inactive'
