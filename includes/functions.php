@@ -21,11 +21,17 @@ function send_login_code($recipient_email, $code) {
         }
         write_log("API Key obtenida correctamente.");
 
-        // 2. Configurar el cliente de la API de Sendinblue (nombre antiguo de Brevo)
-        // Se usa "SendinBlue" porque es la librería que está instalada en vendor/.
+        // 2. Configurar el cliente de la API de Brevo (anteriormente Sendinblue)
         $config = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('api-key', $api_key);
+        // --- FIX: Forzar el host de la API de Brevo ---
+        // La librería puede estar apuntando al host antiguo de Sendinblue.
+        // Se establece explícitamente el host correcto para asegurar la comunicación.
+        $config->setHost('https://api.brevo.com/v3');
+        // -----------------------------------------
+        
         $apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(new GuzzleHttp\Client(), $config);
-        write_log("Cliente de la API de Sendinblue configurado.");
+        write_log("Cliente de la API de Brevo configurado con el host: " . $config->getHost());
+
 
         // 3. Crear el objeto del email
         $sendSmtpEmail = new \SendinBlue\Client\Model\SendSmtpEmail([
@@ -36,13 +42,22 @@ function send_login_code($recipient_email, $code) {
         ]);
         write_log("Objeto de email creado. Listo para enviar.");
 
-        // 4. Enviar el email
-        $apiInstance->sendTransacEmail($sendSmtpEmail);
-        write_log("Llamada a sendTransacEmail completada exitosamente para {$recipient_email}.");
-        return true;
+        // 4. Enviar el email y registrar la respuesta
+        $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+        write_log("Llamada a sendTransacEmail completada. Respuesta de la API: " . $result);
+        
+        // Comprobar si la respuesta contiene un ID de mensaje, lo que indica éxito.
+        if ($result->getMessageId()) {
+            write_log("Email enviado exitosamente a {$recipient_email} con Message ID: " . $result->getMessageId());
+            return true;
+        } else {
+            write_log("La API no devolvió un Message ID. El envío pudo haber fallado silenciosamente.");
+            return false;
+        }
 
-    } catch (Throwable $e) { // Capturar cualquier tipo de error (Exception o Error)
-        write_log("¡ERROR FATAL en send_login_code! Mensaje: " . $e->getMessage() . " | Archivo: " . $e->getFile() . " | Línea: " . $e->getLine());
+    } catch (Throwable $e) { // Capturar y registrar cualquier tipo de error (Exception o Error)
+        // Se registra el error con más detalle para facilitar la depuración futura.
+        write_log("¡ERROR FATAL en send_login_code! Mensaje: " . $e->getMessage() . " | Archivo: " . $e->getFile() . " | Línea: " . $e->getLine() . " | Trace: " . $e->getTraceAsString());
         return false;
     }
 }
