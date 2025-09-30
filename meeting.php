@@ -2,55 +2,28 @@
 session_start();
 
 // 1. Verificar que el usuario tenga una sesión completamente válida.
-// CORRECCIÓN: Se usa 'user_id' que es la variable correcta establecida en el login, no 'property_id'.
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
 }
 
+// 2. Obtener los datos del usuario para mostrarlos en la página.
 require_once 'includes/db.php'; // Incluir la conexión a la BD
-
-// 2. Verificación CRÍTICA: Asegurarse de que la sesión esté 'conectada' en la base de datos.
-// Esto previene que un usuario permanezca en la reunión si el admin lo ha desconectado.
-$user_id = $_SESSION['user_id'];
-$meeting_id = $_SESSION['meeting_id'];
-
-try {
-    // CORRECCIÓN: Se consulta la tabla 'user_sessions' con 'property_id', que corresponde a 'user_id' en la sesión.
-    $stmt = $pdo->prepare("SELECT status FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
-    $stmt->execute([$user_id, $meeting_id]);
-    $session_status = $stmt->fetchColumn();
-
-    if ($session_status !== 'connected') {
-        // Si la sesión no está activa ('connected') en la BD, destruir la sesión de PHP y redirigir.
-        session_destroy();
-        header("Location: index.php?message=session_expired");
-        exit;
-    }
-
-} catch (PDOException $e) {
-    // En caso de error de BD, es más seguro cerrar la sesión.
-    session_destroy();
-    header("Location: index.php?message=db_error");
-    exit;
-}
-
-// 3. Obtener los datos del usuario para mostrarlos en la página.
 $user_name = 'Usuario';
 $house_number = 'N/A';
 $coefficient = 'N/A';
 
-// Usar el user_id de la sesión (que es el ID de la propiedad).
-$stmt_user = $pdo->prepare("SELECT owner_name, house_number, coefficient FROM properties WHERE id = ?");
-$stmt_user->execute([$user_id]);
-$user = $stmt_user->fetch(PDO::FETCH_ASSOC);
-if ($user) {
-    $user_name = $user['owner_name'];
-    $house_number = $user['house_number'];
-    $coefficient = $user['coefficient'];
+if (isset($_SESSION['user_id'])) { // Usar user_id (ID de la propiedad) que se establece en el login
+    $stmt = $pdo->prepare("SELECT owner_name, house_number, coefficient FROM properties WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user) {
+        $user_name = $user['owner_name'];
+        $house_number = $user['house_number'];
+        $coefficient = $user['coefficient'];
+    }
 }
-
-$user_property_id_for_js = $user_id;
+$user_property_id_for_js = $_SESSION['user_id'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -148,7 +121,6 @@ $user_property_id_for_js = $user_id;
                 const data = await response.json();
 
                 if (data.status === 'opened') {
-                    // La reunión está activa, mostrar la vista principal.
                     if (waitingRoom.style.display !== 'none') {
                         waitingRoom.style.display = 'none';
                         meetingView.style.display = 'block';
@@ -156,20 +128,22 @@ $user_property_id_for_js = $user_id;
                         setInterval(updateUserDashboard, 5000);
                         updateUserDashboard();
                     }
-                } else if (data.status === 'created') {
-                    // La reunión está creada pero no iniciada, mantener en sala de espera.
-                    waitingRoom.style.display = 'block';
-                    meetingView.style.display = 'none';
                 } else {
-                    // Para cualquier otro estado (ej. 'closed', null), la sesión ya no es válida.
-                    alert('La reunión ha finalizado o ya no se encuentra disponible. Serás redirigido a la página de inicio.');
-                    window.location.href = 'logout.php';
+                    // Si el usuario estaba en la reunión y esta se cerró, forzar el logout.
+                    if (meetingView.style.display === 'block') {
+                        alert('La reunión ha finalizado. Serás redirigido a la página de inicio.');
+                        window.location.href = 'logout.php';
+                    } else {
+                        // Si el usuario estaba en la sala de espera, mantenerlo ahí.
+                        waitingRoom.style.display = 'block';
+                        meetingView.style.display = 'none';
+                    }
                 }
             } catch (error) {
                 console.error('Error al verificar el estado de la reunión:', error);
-                // En caso de un error de red, es más seguro redirigir para evitar estados inconsistentes.
-                alert('Se perdió la conexión con el servidor. Serás redirigido a la página de inicio.');
-                window.location.href = 'logout.php';
+                // Mantener la vista de espera en caso de error para evitar una pantalla en blanco
+                waitingRoom.style.display = 'block';
+                meetingView.style.display = 'none';
             }
         }
 
@@ -184,13 +158,6 @@ $user_property_id_for_js = $user_id;
             try {
                 const response = await fetch(`api/real_time_data.php?t=${new Date().getTime()}`);
                 const data = await response.json();
-
-                if (data.status === 'disconnected') {
-                    // El servidor ha indicado que esta sesión ha sido desconectada. Forzar logout.
-                    alert('El administrador ha finalizado tu sesión.');
-                    window.location.href = 'logout.php';
-                    return; // Detener la ejecución para evitar más actualizaciones
-                }
 
                 if (data.error) {
                     console.error('Error al cargar datos del dashboard:', data.error);
@@ -228,18 +195,16 @@ $user_property_id_for_js = $user_id;
                 // Actualizar el nuevo campo de contador de usuarios
                 document.getElementById('connected-users-count').textContent = data.users.connected_count;
 
-                // Verificación de Desconexión Forzada (Capa 2 de seguridad):
-                // Si el servidor responde correctamente (no hay error 403), aún verificamos
-                // si el usuario actual está en la lista de usuarios conectados.
+                // --- Verificación de Desconexión Forzada ---
                 const currentUserPropertyId = <?php echo $user_property_id_for_js; ?>;
-                if (timerInterval) { // Solo ejecutar si la reunión ya ha comenzado.
-                    const isCurrentUserConnected = data.users.list.some(user => user.property_id == currentUserPropertyId);
-                    if (!isCurrentUserConnected) {
-                        alert('El administrador ha finalizado tu sesión.');
-                        window.location.href = 'logout.php';
-                        return;
-                    }
+                const isCurrentUserConnected = data.users.list.some(user => user.property_id == currentUserPropertyId);
+                
+                if (!isCurrentUserConnected && timerInterval) { // timerInterval asegura que esto solo se ejecute si ya estaba en la reunión
+                    alert('El administrador ha finalizado tu sesión.');
+                    window.location.href = 'logout.php';
+                    return; // Detener la ejecución para evitar más actualizaciones
                 }
+                // --- Fin de la Verificación ---
 
                 const quorumStatusEl = document.getElementById('quorum-status');
                 if (data.quorum.has_quorum) {
@@ -281,10 +246,6 @@ $user_property_id_for_js = $user_id;
 
             } catch (error) {
                 console.error('Error fatal al actualizar el dashboard del usuario:', error);
-                // Si hay un error de red o un error 403 (sesión inválida),
-                // es más seguro redirigir al logout para evitar un estado inconsistente.
-                alert('Se ha perdido la conexión con la reunión. Serás redirigido a la página de inicio.');
-                window.location.href = 'logout.php';
             }
         }
     </script>

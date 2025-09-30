@@ -5,17 +5,9 @@ require '../includes/db.php';
 
 header('Content-Type: application/json');
 
-// 1. Validar que el usuario esté logueado y su sesión activa en la base de datos
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['meeting_id'])) {
+// 1. Validar que el usuario esté logueado
+if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'No autorizado.']);
-    exit;
-}
-
-// Verificación CRÍTICA: Asegurarse de que la sesión esté 'conectada' en la base de datos.
-$stmt_session = $pdo->prepare("SELECT 1 FROM user_sessions WHERE property_id = ? AND meeting_id = ? AND status = 'connected'");
-$stmt_session->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
-if ($stmt_session->fetchColumn() === false) {
-    echo json_encode(['success' => false, 'message' => 'Tu sesión ha sido finalizada por el administrador y no puedes votar.']);
     exit;
 }
 

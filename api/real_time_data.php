@@ -13,50 +13,6 @@ if (!$is_user && !$is_admin) {
     exit;
 }
 
-// Si es un usuario normal, verificar que su sesión siga siendo válida.
-if ($is_user) {
-    // Esta consulta es CRÍTICA. Verifica dos cosas:
-    // 1. Si la sesión del usuario individualmente ha sido marcada como 'disconnected'.
-    // 2. Si el administrador ha forzado una desconexión de TODOS los usuarios después de que este usuario iniciara sesión.
-    $stmt_session = $pdo->prepare(
-        "SELECT 
-            us.status,
-            us.login_time,
-            m.force_logout_timestamp
-         FROM user_sessions us
-         JOIN meetings m ON us.meeting_id = m.id
-         WHERE us.property_id = ? AND us.meeting_id = ?"
-    );
-    $stmt_session->execute([$_SESSION['user_id'], $_SESSION['meeting_id']]);
-    $session_info = $stmt_session->fetch(PDO::FETCH_ASSOC);
-
-    $force_logout = false;
-    if ($session_info) {
-        if ($session_info['status'] !== 'connected') {
-            $force_logout = true;
-        }
-        
-        // Comprobar si el timestamp de forzar logout es más reciente que el de login del usuario.
-        if ($session_info['force_logout_timestamp'] && $session_info['login_time']) {
-            $force_logout_time = new DateTime($session_info['force_logout_timestamp']);
-            $login_time = new DateTime($session_info['login_time']);
-            if ($force_logout_time > $login_time) {
-                $force_logout = true;
-            }
-        }
-    } else {
-        // Si no hay información de sesión, forzar logout por seguridad.
-        $force_logout = true;
-    }
-
-    if ($force_logout) {
-        // Enviar una respuesta específica que el cliente pueda interpretar para forzar el logout.
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'disconnected']);
-        exit;
-    }
-}
-
 // Obtener la reunión activa (la última abierta)
 $stmt_meeting = $pdo->prepare("SELECT * FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
 $stmt_meeting->execute();
@@ -70,7 +26,6 @@ if (!$meeting) {
 // 1. Calcular el coeficiente total correctamente, incluyendo los poderes.
 
 // Primero, obtener los IDs de las propiedades de los asistentes conectados.
-// Se añade "AND status = 'connected'" para asegurar que solo contamos a los activos.
 $stmt_attendees = $pdo->prepare("SELECT property_id FROM user_sessions WHERE meeting_id = ? AND status = 'connected'");
 $stmt_attendees->execute([$meeting['id']]);
 $attendee_property_ids = $stmt_attendees->fetchAll(PDO::FETCH_COLUMN);
@@ -111,7 +66,6 @@ $total_coefficient = $total_coefficient_query->fetchColumn();
 $quorum_percentage = ($total_coefficient > 0) ? ($current_coefficient_sum / $total_coefficient) * 100 : 0;
 
 // 4. Obtener lista de usuarios conectados, incluyendo información de poderes recibidos
-// Se añade "AND us.status = 'connected'" en el WHERE para asegurar que solo listamos usuarios activos.
 $stmt_users = $pdo->prepare(
     "SELECT 
         p.id AS property_id,

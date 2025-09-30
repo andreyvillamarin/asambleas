@@ -29,14 +29,9 @@ try {
         $response = ['success' => true, 'message' => 'Reunión cerrada.'];
     }
     elseif ($action === 'disconnect_all' && $meeting_id) {
-        // 1. Poner un timestamp para forzar la desconexión.
-        // Se usará `force_logout_timestamp` para invalidar sesiones de usuario.
-        $stmt_force_logout = $pdo->prepare("UPDATE meetings SET force_logout_timestamp = NOW() WHERE id = ?");
-        $stmt_force_logout->execute([$meeting_id]);
-
-        // 2. Marcar todas las sesiones de la reunión como 'disconnected' en lugar de borrarlas.
-        $stmt_update = $pdo->prepare("UPDATE user_sessions SET status = 'disconnected' WHERE meeting_id = ?");
-        $stmt_update->execute([$meeting_id]);
+        // Eliminar todas las sesiones de la reunión, pero no cerrar la reunión en sí.
+        $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
+        $stmt_delete->execute([$meeting_id]);
         
         $response = ['success' => true, 'message' => 'Todos los usuarios han sido desconectados.'];
     }
@@ -67,4 +62,3 @@ try {
 }
 
 echo json_encode($response);
-?>

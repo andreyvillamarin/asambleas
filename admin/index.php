@@ -65,7 +65,6 @@ $active_meeting = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<?php /* Deshabilitado temporalmente para evitar error fatal por tabla 'polls' inexistente.
 <div class="card">
     <div class="card-header">
         <h2><i class="fas fa-poll"></i> Votaciones para esta Reunión</h2>
@@ -74,7 +73,6 @@ $active_meeting = $stmt->fetch(PDO::FETCH_ASSOC);
         <div id="polls-list"></div>
     </div>
 </div>
-*/ ?>
 
 <?php else: ?>
 <p>No hay ninguna reunión activa en este momento. Ve a la sección de <a href="meetings.php">Reuniones</a> para abrir una.</p>
