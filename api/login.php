@@ -164,45 +164,51 @@ if ($action === 'check_id') {
         
         // Verificar si el código es correcto y no ha expirado
         if ($stored_code === $code && (new DateTime() < new DateTime($expires_at_str))) {
-            // El código es válido. Obtener la reunión activa.
+            // El código es válido. Iniciar sesión básica.
+            $_SESSION['user_id'] = $user_data['id']; // ID de la propiedad
+            $_SESSION['logged_in'] = true;
+
+            // Limpiar el código de la base de datos inmediatamente después de usarlo.
+            $stmt_clean = $pdo->prepare("UPDATE properties SET login_code = NULL, login_code_expires_at = NULL WHERE owner_id_card = ?");
+            $stmt_clean->execute([$id_card]);
+
+            // Ahora, comprobar si hay una reunión activa para decidir a dónde redirigir.
             $stmt_meeting = $pdo->prepare("SELECT id FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
             $stmt_meeting->execute();
             $active_meeting = $stmt_meeting->fetch(PDO::FETCH_ASSOC);
 
-            if (!$active_meeting) {
-                $response['message'] = 'No hay ninguna reunión activa en este momento. Por favor, inténtalo más tarde.';
-                echo json_encode($response);
-                exit;
-            }
+            if ($active_meeting) {
+                // --- CASO 1: La reunión está activa ---
+                write_log("Reunión activa encontrada (ID: {$active_meeting['id']}). Procediendo a registrar sesión de usuario.");
+                
+                // Lógica de "Upsert" para la sesión del usuario
+                $stmt_check = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
+                $stmt_check->execute([$user_data['id'], $active_meeting['id']]);
+                $existing_session_id = $stmt_check->fetchColumn();
 
-            // Iniciar sesión
-            $_SESSION['user_id'] = $user_data['id']; // ID de la propiedad
-            $_SESSION['logged_in'] = true;
+                if ($existing_session_id) {
+                    $stmt_upsert = $pdo->prepare("UPDATE user_sessions SET status = 'connected', login_time = NOW(), logout_time = NULL WHERE id = ?");
+                    $stmt_upsert->execute([$existing_session_id]);
+                } else {
+                    $stmt_upsert = $pdo->prepare("INSERT INTO user_sessions (property_id, meeting_id, status, login_time) VALUES (?, ?, 'connected', NOW())");
+                    $stmt_upsert->execute([$user_data['id'], $active_meeting['id']]);
+                }
+                
+                write_log("Verificación exitosa para la cédula {$id_card}. Redirigiendo a meeting.php.");
+                $response = [
+                    'success' => true,
+                    'redirect' => 'meeting.php'
+                ];
 
-            // Lógica de "Upsert" para la sesión del usuario
-            $stmt_check = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
-            $stmt_check->execute([$user_data['id'], $active_meeting['id']]);
-            $existing_session_id = $stmt_check->fetchColumn();
-
-            if ($existing_session_id) {
-                // Si ya existe, actualizarla (re-conectar)
-                $stmt_upsert = $pdo->prepare("UPDATE user_sessions SET status = 'connected', login_time = NOW(), logout_time = NULL WHERE id = ?");
-                $stmt_upsert->execute([$existing_session_id]);
             } else {
-                // Si no existe, insertarla
-                $stmt_upsert = $pdo->prepare("INSERT INTO user_sessions (property_id, meeting_id, status, login_time) VALUES (?, ?, 'connected', NOW())");
-                $stmt_upsert->execute([$user_data['id'], $active_meeting['id']]);
+                // --- CASO 2: No hay reunión activa ---
+                // El usuario ha iniciado sesión, pero no hay una reunión a la que unirse todavía.
+                write_log("Verificación exitosa para la cédula {$id_card}. No hay reunión activa. Redirigiendo a la sala de espera.");
+                $response = [
+                    'success' => true,
+                    'redirect' => 'waiting_room.php' // Redirigir a la nueva página de sala de espera
+                ];
             }
-            
-            // Limpiar el código de la base de datos después de usarlo
-            $stmt_clean = $pdo->prepare("UPDATE properties SET login_code = NULL, login_code_expires_at = NULL WHERE owner_id_card = ?");
-            $stmt_clean->execute([$id_card]);
-
-            write_log("Verificación exitosa para la cédula {$id_card}. Redirigiendo a meeting.php.");
-            $response = [
-                'success' => true,
-                'redirect' => 'meeting.php' // URL real de la reunión
-            ];
         } else {
             // El código es incorrecto o ha expirado
             write_log("Error en verify_code: El código para la cédula {$id_card} es incorrecto o ha expirado.");
