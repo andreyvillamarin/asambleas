@@ -1,0 +1,12 @@
+[30-Sep-2025 15:58:53 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[30-Sep-2025 15:58:53 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[30-Sep-2025 15:58:58 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[30-Sep-2025 15:58:58 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16

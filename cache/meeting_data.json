@@ -1,0 +1,33 @@
+{
+    "status": "opened",
+    "meeting_name": "Asamblea Novaterra",
+    "start_time": 1759256723,
+    "quorum": {
+        "percentage": 34.21,
+        "current_coefficient": 0.78,
+        "required": 50,
+        "has_quorum": false
+    },
+    "users": {
+        "connected_count": 2,
+        "list": [
+            {
+                "property_id": "4",
+                "owner_name": "Andrey Villamarin",
+                "house_number": "2B4",
+                "coefficient": "0.39000",
+                "power_giver_house": null,
+                "power_giver_coefficient": null
+            },
+            {
+                "property_id": "1",
+                "owner_name": "Yolima Quintero",
+                "house_number": "2B3",
+                "coefficient": "0.39000",
+                "power_giver_house": null,
+                "power_giver_coefficient": null
+            }
+        ]
+    },
+    "active_poll": false
+}

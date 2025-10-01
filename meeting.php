@@ -166,7 +166,7 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
 
                 // Iniciar el temporizador si no está ya iniciado y tenemos una hora de inicio
                 if (data.start_time && !timerInterval) {
-                    const startTime = new Date(data.start_time.replace(' ', 'T') + 'Z'); // Ajustar para compatibilidad
+                    const startTime = new Date(data.start_time * 1000); // Usar el timestamp Unix (en milisegundos)
                     const timerContainer = document.getElementById('meeting-timer-container');
                     const timerEl = document.getElementById('meeting-timer');
                     

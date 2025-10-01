@@ -4,10 +4,13 @@ session_start();
 
 if (isset($_SESSION['user_id'])) {
     require 'includes/db.php';
+    require_once 'includes/cache_updater.php'; // Incluir el actualizador de caché
     
     // Marcar como desconectado en la tabla de sesiones activas
     $stmt = $pdo->prepare("UPDATE user_sessions SET status = 'disconnected', logout_time = NOW() WHERE property_id = ? AND status = 'connected'");
     $stmt->execute([$_SESSION['user_id']]);
+
+    update_meeting_cache(); // Actualizar caché para reflejar la salida del usuario
 }
 
 // Destruir todas las variables de sesión.

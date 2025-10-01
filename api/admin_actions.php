@@ -1,7 +1,8 @@
 <?php
 // api/admin_actions.php
-require_once __DIR__ . '/../admin/includes/auth_check.php'; // Usa el auth_check para seguridad
+require_once __DIR__ . '/../admin/includes/auth_check.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/cache_updater.php'; // Incluir el actualizador de caché
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => 'Acción no válida.'];
@@ -10,6 +11,11 @@ $meeting_id = $_POST['meeting_id'] ?? null;
 $poll_id = $_POST['poll_id'] ?? null;
 
 try {
+    // NOTA PARA FUTUROS DESARROLLADORES:
+    // Cualquier nueva acción que modifique el estado de la sesión de los usuarios
+    // (ej. desconectar a un solo usuario) DEBE llamar a `update_meeting_cache()`
+    // al final para mantener la consistencia de los datos en tiempo real.
+
     if ($action === 'open_meeting' && $meeting_id) {
         // 1. Desconectar a todos los usuarios de la sesión anterior de esta reunión para reiniciar el temporizador.
         $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
@@ -18,14 +24,24 @@ try {
         // 2. Asegurarse que no haya otra reunión abierta
         $pdo->exec("UPDATE meetings SET status = 'closed' WHERE status = 'opened'");
         
-        // 3. Abrir la nueva
-        $stmt = $pdo->prepare("UPDATE meetings SET status = 'opened' WHERE id = ?");
-        $stmt->execute([$meeting_id]);
+        // 3. Calcular el coeficiente total de toda la propiedad para guardarlo.
+        $total_coefficient_query = $pdo->query("SELECT SUM(REPLACE(coefficient, ',', '.')) FROM properties");
+        $total_coefficient = $total_coefficient_query->fetchColumn();
+
+        // 4. Abrir la nueva, registrar la hora de inicio y el coeficiente total.
+        $stmt = $pdo->prepare(
+            "UPDATE meetings SET status = 'opened', start_time = NOW(), total_coefficient = ? WHERE id = ?"
+        );
+        $stmt->execute([$total_coefficient, $meeting_id]);
+        
+        update_meeting_cache(); // Actualizar caché
         $response = ['success' => true, 'message' => 'Reunión abierta correctamente.'];
     } 
     elseif ($action === 'close_meeting' && $meeting_id) {
         $stmt = $pdo->prepare("UPDATE meetings SET status = 'closed' WHERE id = ?");
         $stmt->execute([$meeting_id]);
+        
+        update_meeting_cache(); // Actualizar caché
         $response = ['success' => true, 'message' => 'Reunión cerrada.'];
     }
     elseif ($action === 'disconnect_all' && $meeting_id) {
@@ -33,6 +49,7 @@ try {
         $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
         $stmt_delete->execute([$meeting_id]);
         
+        update_meeting_cache(); // Actualizar caché
         $response = ['success' => true, 'message' => 'Todos los usuarios han sido desconectados.'];
     }
     elseif ($action === 'open_poll' && $poll_id) {
@@ -62,3 +79,4 @@ try {
 }
 
 echo json_encode($response);
+?>

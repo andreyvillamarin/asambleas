@@ -10,6 +10,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset(
 }
 
 require_once '../includes/db.php';
+require_once '../includes/cache_updater.php'; // Incluir el actualizador de caché
 
 $property_id = $_SESSION['user_id'];
 $response = ['success' => false, 'message' => 'No se pudo registrar la sesión.'];
@@ -45,6 +46,7 @@ try {
     }
 
     if ($success) {
+        update_meeting_cache(); // Actualizar la caché para reflejar el nuevo usuario
         $response = ['success' => true, 'message' => 'Sesión registrada correctamente.'];
     } else {
         $response['message'] = 'Error al guardar los datos de la sesión en la base de datos.';
