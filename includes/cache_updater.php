@@ -2,7 +2,13 @@
 // includes/cache_updater.php
 
 function update_meeting_cache() {
-    require_once __DIR__ . '/db.php';
+    // FIX: La variable $pdo se define en el ámbito global en db.php.
+    // Es necesario importarla al ámbito de la función para poder utilizarla.
+    global $pdo;
+    
+    // La conexión ya se establece en los scripts que llaman a esta función,
+    // por lo que el require_once es redundante y se puede eliminar para mayor claridad.
+    // require_once __DIR__ . '/db.php';
 
     $cache_file_path = __DIR__ . '/../cache/meeting_data.json';
     $cache_dir = dirname($cache_file_path);

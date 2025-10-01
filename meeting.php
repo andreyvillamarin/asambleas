@@ -121,16 +121,28 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
                 const data = await response.json();
 
                 if (data.status === 'opened') {
+                    // FIX: Esta lógica se ejecuta una sola vez, cuando el usuario pasa de la sala de espera a la reunión.
                     if (waitingRoom.style.display !== 'none') {
-                        waitingRoom.style.display = 'none';
-                        meetingView.style.display = 'block';
-                        
-                        // Iniciar la actualización del dashboard y el heartbeat
-                        setInterval(updateUserDashboard, 5000);
-                        updateUserDashboard(); // Carga inicial
+                        // 1. Registrar la sesión del usuario en la reunión ANTES de mostrar el dashboard.
+                        const regResponse = await fetch(`api/register_session.php?action=register&t=${new Date().getTime()}`);
+                        const regResult = await regResponse.json();
 
-                        // Iniciar el heartbeat para mantener la sesión activa
-                        setInterval(sendHeartbeat, 15000); // Enviar cada 15 segundos
+                        if (regResult.success) {
+                            // 2. Si el registro es exitoso, mostrar la vista de la reunión e iniciar las actualizaciones.
+                            waitingRoom.style.display = 'none';
+                            meetingView.style.display = 'block';
+                            
+                            // Iniciar la actualización del dashboard y el heartbeat
+                            setInterval(updateUserDashboard, 5000);
+                            updateUserDashboard(); // Carga inicial
+
+                            // Iniciar el heartbeat para mantener la sesión activa
+                            setInterval(sendHeartbeat, 15000);
+                        } else {
+                            // Si el registro falla, es un error crítico.
+                            alert('Error al unirse a la reunión: ' + regResult.message);
+                            window.location.href = 'logout.php';
+                        }
                     }
                 } else {
                     // Si el usuario estaba en la reunión y esta se cerró, forzar el logout.

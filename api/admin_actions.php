@@ -17,11 +17,13 @@ try {
     // al final para mantener la consistencia de los datos en tiempo real.
 
     if ($action === 'open_meeting' && $meeting_id) {
-        // 1. Desconectar a todos los usuarios de la sesión anterior de esta reunión para reiniciar el temporizador.
-        $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
-        $stmt_delete->execute([$meeting_id]);
+        // Al abrir una reunión, no se deben eliminar las sesiones existentes.
+        // Los usuarios pueden haberse unido a la sala de espera antes de que se abra formalmente.
+        // FIX: Se elimina la línea que borraba todas las sesiones de usuario al abrir la reunión.
+        // $stmt_delete = $pdo->prepare("DELETE FROM user_sessions WHERE meeting_id = ?");
+        // $stmt_delete->execute([$meeting_id]);
 
-        // 2. Asegurarse que no haya otra reunión abierta
+        // 1. Asegurarse que no haya otra reunión abierta (esto es correcto)
         $pdo->exec("UPDATE meetings SET status = 'closed' WHERE status = 'opened'");
         
         // 3. Calcular el coeficiente total de toda la propiedad para guardarlo.
@@ -38,11 +40,18 @@ try {
         $response = ['success' => true, 'message' => 'Reunión abierta correctamente.'];
     } 
     elseif ($action === 'close_meeting' && $meeting_id) {
-        $stmt = $pdo->prepare("UPDATE meetings SET status = 'closed' WHERE id = ?");
-        $stmt->execute([$meeting_id]);
+        // 1. Cerrar la reunión
+        $stmt_meeting = $pdo->prepare("UPDATE meetings SET status = 'closed' WHERE id = ?");
+        $stmt_meeting->execute([$meeting_id]);
+
+        // 2. Desconectar a todos los usuarios de esa reunión.
+        $stmt_sessions = $pdo->prepare(
+            "UPDATE user_sessions SET status = 'disconnected', logout_time = NOW() WHERE meeting_id = ? AND status = 'connected'"
+        );
+        $stmt_sessions->execute([$meeting_id]);
         
         update_meeting_cache(); // Actualizar caché
-        $response = ['success' => true, 'message' => 'Reunión cerrada.'];
+        $response = ['success' => true, 'message' => 'Reunión cerrada y todos los usuarios desconectados.'];
     }
     elseif ($action === 'disconnect_all' && $meeting_id) {
         // Eliminar todas las sesiones de la reunión, pero no cerrar la reunión en sí.

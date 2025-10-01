@@ -15,14 +15,14 @@ function cleanup_stale_sessions(PDO $pdo, int $meeting_id, int $threshold_second
     }
 
     try {
-        // La sintaxis de SQLite para la manipulación de fechas es diferente a la de MySQL.
-        // Se usa strftime('%s', 'now') para obtener el timestamp Unix actual.
+        // Usar TIMESTAMPDIFF para compatibilidad con MySQL.
+        // Esto calcula la diferencia en segundos entre la última vez que se vio al usuario y ahora.
         $stmt = $pdo->prepare(
             "UPDATE user_sessions
-             SET status = 'disconnected', logout_time = CURRENT_TIMESTAMP
+             SET status = 'disconnected', logout_time = NOW()
              WHERE meeting_id = ?
                AND status = 'connected'
-               AND (strftime('%s', 'now') - strftime('%s', last_seen_at)) > ?"
+               AND TIMESTAMPDIFF(SECOND, last_seen_at, NOW()) > ?"
         );
         
         $stmt->execute([$meeting_id, $threshold_seconds]);

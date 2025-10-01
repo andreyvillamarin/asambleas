@@ -51,13 +51,23 @@ if ($action === 'check_id') {
 
         if ($user) {
             // --- Verificación de Sesión Activa ---
-            $stmt_session = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND status = 'connected'");
-            $stmt_session->execute([$user['id']]);
-            if ($stmt_session->fetch()) {
-                $response['message'] = 'Este usuario ya ha ingresado a la plataforma, no se permite más de una sesión por usuario.';
-                write_log("Acceso denegado: El usuario con cédula {$id_card} ya tiene una sesión activa.");
-                echo json_encode($response);
-                exit;
+            // FIX: La verificación de sesión activa solo debe aplicar si hay una reunión en curso.
+            // De lo contrario, un usuario podría quedar bloqueado si una sesión anterior no se cerró correctamente.
+            $stmt_meeting = $pdo->prepare("SELECT id FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
+            $stmt_meeting->execute();
+            $active_meeting = $stmt_meeting->fetch(PDO::FETCH_ASSOC);
+
+            if ($active_meeting) {
+                // Si hay una reunión activa, verificar si el usuario ya tiene una sesión conectada a ESA reunión.
+                $stmt_session = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND meeting_id = ? AND status = 'connected'");
+                $stmt_session->execute([$user['id'], $active_meeting['id']]);
+                
+                if ($stmt_session->fetch()) {
+                    $response['message'] = 'Este usuario ya ha ingresado a la plataforma, no se permite más de una sesión por usuario.';
+                    write_log("Acceso denegado: El usuario con cédula {$id_card} ya tiene una sesión activa en la reunión {$active_meeting['id']}.");
+                    echo json_encode($response);
+                    exit;
+                }
             }
             // --- Fin de Verificación ---
 

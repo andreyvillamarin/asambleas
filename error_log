@@ -10,3 +10,71 @@ Stack trace:
 #0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
 #1 {main}
   thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:30:03 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:30:03 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:30:14 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:30:14 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:31:16 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:31:16 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:38:59 America/Bogota] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '('now', 'localtime') WHERE property_id = ? AND status = 'connected'' at line 1 in /home/qdosnetw/public_html/demos/asambleas/logout.php:11
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(11): PDO->prepare()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/logout.php on line 11
+[01-Oct-2025 07:39:01 America/Bogota] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '('now', 'localtime') WHERE property_id = ? AND status = 'connected'' at line 1 in /home/qdosnetw/public_html/demos/asambleas/logout.php:11
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(11): PDO->prepare()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/logout.php on line 11
+[01-Oct-2025 07:39:03 America/Bogota] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '('now', 'localtime') WHERE property_id = ? AND status = 'connected'' at line 1 in /home/qdosnetw/public_html/demos/asambleas/logout.php:11
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(11): PDO->prepare()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/logout.php on line 11
+[01-Oct-2025 07:39:12 America/Bogota] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '('now', 'localtime') WHERE property_id = ? AND status = 'connected'' at line 1 in /home/qdosnetw/public_html/demos/asambleas/logout.php:11
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(11): PDO->prepare()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/logout.php on line 11
+[01-Oct-2025 07:43:39 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:39 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:42 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:42 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:43 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:43 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:51 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:43:51 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:44:18 America/Bogota] PHP Warning:  Undefined variable $pdo in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16
+[01-Oct-2025 07:44:18 America/Bogota] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php:16
+Stack trace:
+#0 /home/qdosnetw/public_html/demos/asambleas/logout.php(13): update_meeting_cache()
+#1 {main}
+  thrown in /home/qdosnetw/public_html/demos/asambleas/includes/cache_updater.php on line 16

@@ -105,52 +105,35 @@ if (isset($_SESSION['user_id'])) {
         setInterval(updateTime, 1000);
         updateTime();
 
-        const STATUS_CHECK_INTERVAL = 5000; // 5 segundos
+        const STATUS_CHECK_INTERVAL = 5000; // 5 segundos.
 
-        // Esta función intenta registrar la sesión del usuario.
-        async function registerSessionAndRedirect() {
-            try {
-                const response = await fetch('api/register_session.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Solo si el registro es exitoso, se detiene el chequeo y se redirige.
-                    clearInterval(statusInterval);
-                    window.location.href = 'meeting.php';
-                } else {
-                    // Si falla, el error se loguea en la consola y el intervalo seguirá activo para reintentar.
-                    console.error('Error al registrar la sesión:', result.message);
-                }
-            } catch (error) {
-                console.error('Error de red al registrar la sesión:', error);
-            }
-        }
-
-        // Esta función verifica el estado de la reunión periódicamente.
+        // FIX: Se simplifica la lógica de sondeo para que sea más robusta y directa.
+        // Ahora, solo verifica el estado y redirige, dejando que `meeting.php` maneje el registro de la sesión.
         async function checkMeetingStatus() {
             try {
+                // Se añade un timestamp para evitar problemas de caché con la solicitud GET.
                 const response = await fetch(`api/meeting_status.php?t=${new Date().getTime()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
 
+                // Si la reunión está abierta, redirigir inmediatamente.
                 if (data.status === 'opened') {
-                    // Si la reunión está abierta, intenta registrar la sesión.
-                    // El intervalo solo se detendrá si el registro es exitoso.
-                    await registerSessionAndRedirect();
+                    // Detener el sondeo y redirigir a la página de la reunión.
+                    clearInterval(statusInterval);
+                    window.location.href = 'meeting.php';
                 }
+                // Si el estado es 'closed' o 'pending', no se hace nada y la página sigue esperando.
             } catch (error) {
+                // Si hay un error (ej. red, JSON malformado), se muestra en la consola pero el sondeo continúa.
                 console.error('Error al verificar el estado de la reunión:', error);
             }
         }
 
-        // Iniciar la verificación inmediatamente y luego cada 5 segundos.
+        // Iniciar la verificación inmediatamente y luego repetirla en el intervalo definido.
         const statusInterval = setInterval(checkMeetingStatus, STATUS_CHECK_INTERVAL);
-        checkMeetingStatus(); // Llamada inicial
+        checkMeetingStatus(); // Realizar una llamada inicial al cargar la página.
     </script>
 </body>
 </html>

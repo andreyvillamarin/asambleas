@@ -24,13 +24,19 @@ function send_login_code($recipient_email, $code) {
         // 2. Configurar el cliente de la API de Brevo (anteriormente Sendinblue)
         $config = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('api-key', $api_key);
         // --- FIX: Forzar el host de la API de Brevo ---
-        // La librería puede estar apuntando al host antiguo de Sendinblue.
-        // Se establece explícitamente el host correcto para asegurar la comunicación.
+        // La librería antigua puede estar apuntando a un endpoint obsoleto y lento.
+        // Se establece explícitamente el host correcto para asegurar una comunicación rápida.
         $config->setHost('https://api.brevo.com/v3');
-        // -----------------------------------------
         
-        $apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(new GuzzleHttp\Client(), $config);
-        write_log("Cliente de la API de Brevo configurado con el host: " . $config->getHost());
+        // --- FIX: Añadir timeouts al cliente Guzzle ---
+        // Se establece un timeout de conexión y de respuesta para evitar que la
+        // aplicación se quede colgada si la API de Brevo no responde a tiempo.
+        $guzzleClient = new GuzzleHttp\Client([
+            'timeout' => 10, // Timeout de respuesta en segundos
+            'connect_timeout' => 10, // Timeout de conexión en segundos
+        ]);
+        $apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi($guzzleClient, $config);
+        write_log("Cliente de la API de Brevo configurado con timeouts y el host: " . $config->getHost());
 
 
         // 3. Crear el objeto del email
