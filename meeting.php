@@ -124,9 +124,13 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
                     if (waitingRoom.style.display !== 'none') {
                         waitingRoom.style.display = 'none';
                         meetingView.style.display = 'block';
-                        // Iniciar la actualización del dashboard solo cuando la reunión está activa
+                        
+                        // Iniciar la actualización del dashboard y el heartbeat
                         setInterval(updateUserDashboard, 5000);
-                        updateUserDashboard();
+                        updateUserDashboard(); // Carga inicial
+
+                        // Iniciar el heartbeat para mantener la sesión activa
+                        setInterval(sendHeartbeat, 15000); // Enviar cada 15 segundos
                     }
                 } else {
                     // Si el usuario estaba en la reunión y esta se cerró, forzar el logout.
@@ -151,6 +155,15 @@ $user_property_id_for_js = $_SESSION['user_id'] ?? 0;
         setInterval(checkMeetingStatus, 5000);
         // Verificar inmediatamente al cargar la página
         checkMeetingStatus();
+
+        // Función para enviar el heartbeat
+        async function sendHeartbeat() {
+            try {
+                await fetch(`api/register_session.php?action=heartbeat&t=${new Date().getTime()}`);
+            } catch (error) {
+                console.error('Error al enviar el heartbeat:', error);
+            }
+        }
 
         let timerInterval = null; // Variable para controlar el intervalo del temporizador
 

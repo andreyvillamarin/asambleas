@@ -28,28 +28,40 @@ try {
     }
 
     $meeting_id = $active_meeting['id'];
+    $action = $_GET['action'] ?? 'register'; // Por defecto, la acción es registrar
 
-    // 3. Lógica de "Upsert": Insertar o actualizar la sesión del usuario
-    // Primero, verificar si ya existe una sesión para este usuario en esta reunión.
+    // 3. Lógica de "Upsert" o "Heartbeat"
     $stmt_check = $pdo->prepare("SELECT id FROM user_sessions WHERE property_id = ? AND meeting_id = ?");
     $stmt_check->execute([$property_id, $meeting_id]);
-    $existing_session_id = $stmt_check->fetchColumn();
+    $session_id = $stmt_check->fetchColumn();
 
-    if ($existing_session_id) {
-        // Si ya existe, simplemente se actualiza el estado y la hora de login (reconexión).
-        $stmt_upsert = $pdo->prepare("UPDATE user_sessions SET status = 'connected', login_time = NOW(), logout_time = NULL WHERE id = ?");
-        $success = $stmt_upsert->execute([$existing_session_id]);
-    } else {
-        // Si no existe, se inserta un nuevo registro.
-        $stmt_upsert = $pdo->prepare("INSERT INTO user_sessions (property_id, meeting_id, status, login_time) VALUES (?, ?, 'connected', NOW())");
-        $success = $stmt_upsert->execute([$property_id, $meeting_id]);
-    }
+    if ($action === 'heartbeat') {
+        if ($session_id) {
+            // Acción de Heartbeat: solo actualizar 'last_seen_at' y el estado a 'connected'
+            $stmt_heartbeat = $pdo->prepare("UPDATE user_sessions SET status = 'connected', last_seen_at = NOW() WHERE id = ?");
+            $success = $stmt_heartbeat->execute([$session_id]);
+            $response = ['success' => $success, 'message' => 'Heartbeat recibido.'];
+        } else {
+            // Si se envía un heartbeat para una sesión no registrada, se ignora.
+            $response = ['success' => false, 'message' => 'Sesión no encontrada para el heartbeat.'];
+        }
+    } elseif ($action === 'register') {
+        if ($session_id) {
+            // Si ya existe, se actualiza el estado, la hora de login y 'last_seen_at' (reconexión)
+            $stmt_upsert = $pdo->prepare("UPDATE user_sessions SET status = 'connected', login_time = NOW(), last_seen_at = NOW(), logout_time = NULL WHERE id = ?");
+            $success = $stmt_upsert->execute([$session_id]);
+        } else {
+            // Si no existe, se inserta un nuevo registro con 'last_seen_at'
+            $stmt_upsert = $pdo->prepare("INSERT INTO user_sessions (property_id, meeting_id, status, login_time, last_seen_at) VALUES (?, ?, 'connected', NOW(), NOW())");
+            $success = $stmt_upsert->execute([$property_id, $meeting_id]);
+        }
 
-    if ($success) {
-        update_meeting_cache(); // Actualizar la caché para reflejar el nuevo usuario
-        $response = ['success' => true, 'message' => 'Sesión registrada correctamente.'];
-    } else {
-        $response['message'] = 'Error al guardar los datos de la sesión en la base de datos.';
+        if ($success) {
+            update_meeting_cache(); // Actualizar la caché para reflejar el nuevo usuario
+            $response = ['success' => true, 'message' => 'Sesión registrada correctamente.'];
+        } else {
+            $response['message'] = 'Error al guardar los datos de la sesión en la base de datos.';
+        }
     }
 
 } catch (PDOException $e) {

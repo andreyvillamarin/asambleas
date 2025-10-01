@@ -1,29 +1,44 @@
 <?php
-header('Content-Type: application/json');
-session_start();
-require_once '../includes/db.php';
+// api/meeting_status.php
+// Este script ahora limpia sesiones obsoletas antes de reportar el estado.
+session_start(); // Necesario para la sesi贸n, aunque no se use para validar el acceso aqu铆.
 
-// Asegurarse de que el usuario esté logueado para consultar el estado
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
-    exit;
-}
+header('Content-Type: application/json');
+
+require_once '../includes/db.php';
+require_once '../includes/session_cleaner.php';
+require_once '../includes/cache_updater.php';
+
+$response = ['status' => 'closed']; // Estado por defecto
 
 try {
-    // Consultar si hay alguna reunión con estado 'opened'
-    $stmt = $pdo->prepare("SELECT status FROM meetings WHERE status = 'opened' LIMIT 1");
-    $stmt->execute();
-    $meeting = $stmt->fetch(PDO::FETCH_ASSOC);
+    // 1. Encontrar la reuni贸n activa para obtener su ID.
+    $stmt_meeting = $pdo->prepare("SELECT id FROM meetings WHERE status = 'opened' ORDER BY id DESC LIMIT 1");
+    $stmt_meeting->execute();
+    $active_meeting = $stmt_meeting->fetch(PDO::FETCH_ASSOC);
 
-    if ($meeting) {
-        // Si se encuentra una reunión abierta, devolver 'opened'
-        echo json_encode(['status' => 'opened']);
-    } else {
-        // Si no, devolver 'inactive'
-        echo json_encode(['status' => 'inactive']);
+    if ($active_meeting) {
+        $meeting_id = $active_meeting['id'];
+
+        // 2. Limpiar sesiones obsoletas para esta reuni贸n.
+        $cleaned_sessions_count = cleanup_stale_sessions($pdo, $meeting_id, 35); // 35 segundos de umbral
+
+        // 3. Si se limpi贸 alguna sesi贸n, la cach茅 de datos debe actualizarse.
+        if ($cleaned_sessions_count > 0) {
+            update_meeting_cache();
+        }
+
+        // 4. Como encontramos una reuni贸n activa, el estado es 'opened'.
+        $response['status'] = 'opened';
     }
-} catch (PDOException $e) {
-    // Manejo de errores de base de datos
-    echo json_encode(['status' => 'error', 'message' => 'Error en la base de datos: ' . $e->getMessage()]);
+    // Si no hay reuni贸n activa, el estado por defecto 'closed' es correcto.
+
+} catch (Exception $e) {
+    // En caso de un error grave, se reporta 'closed' para seguridad.
+    // Se podr铆a loguear el error.
+    // error_log("Error en meeting_status.php: " . $e->getMessage());
+    $response = ['status' => 'closed', 'error' => $e->getMessage()];
 }
+
+echo json_encode($response);
 ?>
