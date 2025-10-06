@@ -12,11 +12,11 @@ $stmt = $pdo->prepare("SELECT * FROM meetings WHERE id = ?");
 $stmt->execute([$meeting_id]);
 $meeting = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// 2. OBTENER LISTA DE ASISTENTES
+// 2. OBTENER LISTA DE ASISTENTES CONECTADOS
 $stmt_attendees = $pdo->prepare(
-    "SELECT p.house_number, p.owner_name, p.coefficient 
-     FROM user_sessions us JOIN properties p ON us.property_id = p.id 
-     WHERE us.meeting_id = ? ORDER BY p.owner_name"
+    "SELECT p.house_number, p.owner_name, p.coefficient
+     FROM user_sessions us JOIN properties p ON us.property_id = p.id
+     WHERE us.meeting_id = ? AND us.status = 'connected' ORDER BY p.owner_name"
 );
 $stmt_attendees->execute([$meeting_id]);
 $attendees = $stmt_attendees->fetchAll(PDO::FETCH_ASSOC);
@@ -24,17 +24,14 @@ $attendees = $stmt_attendees->fetchAll(PDO::FETCH_ASSOC);
 // 3. CALCULAR QUORUM FINAL
 $final_quorum = 0;
 foreach ($attendees as $attendee) {
-    $final_quorum += $attendee['coefficient'];
+    // Se convierte la coma en punto para el cálculo
+    $final_quorum += floatval(str_replace(',', '.', $attendee['coefficient']));
 }
-$total_coefficient = $pdo->query("SELECT SUM(coefficient) FROM properties")->fetchColumn();
+$total_coefficient_str = $pdo->query("SELECT SUM(REPLACE(coefficient, ',', '.')) FROM properties")->fetchColumn();
+$total_coefficient = floatval($total_coefficient_str);
 $quorum_percentage = ($total_coefficient > 0) ? ($final_quorum / $total_coefficient) * 100 : 0;
 
-// 4. OBTENER VOTACIONES Y RESULTADOS
-$stmt_polls = $pdo->prepare("SELECT * FROM polls WHERE meeting_id = ? AND status = 'closed'");
-$stmt_polls->execute([$meeting_id]);
-$polls = $stmt_polls->fetchAll(PDO::FETCH_ASSOC);
-
-// 5. GENERAR EL PDF
+// 4. GENERAR EL PDF
 class PDF extends FPDF {
     function Header() {
         $this->SetFont('Arial', 'B', 15);
@@ -65,29 +62,33 @@ $pdf->SetFont('Arial', 'B', 12);
 $pdf->Cell(0, 10, 'Resumen del Quorum', 0, 1);
 $pdf->SetFont('Arial', '', 12);
 $pdf->Cell(0, 8, 'Quorum final alcanzado: ' . number_format($quorum_percentage, 2) . '%', 0, 1);
-$pdf->Cell(0, 8, 'Coeficiente total de asistentes: ' . $final_quorum, 0, 1);
+$pdf->Cell(0, 8, 'Coeficiente total de asistentes: ' . number_format($final_quorum, 4), 0, 1);
 $pdf->Cell(0, 8, 'Total de asistentes: ' . count($attendees), 0, 1);
 $pdf->Ln(10);
 
-// Votaciones
+// Lista de Asistentes
 $pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(0, 10, 'Resultados de las Votaciones', 0, 1);
-$pdf->SetFont('Arial', '', 12);
-foreach ($polls as $index => $poll) {
-    $pdf->SetFont('Arial', 'B', 11);
-    $pdf->MultiCell(0, 8, ($index + 1) . '. ' . utf8_decode($poll['question']), 0, 'L');
-    $pdf->SetFont('Arial', '', 11);
-    $results = json_decode($poll['results'], true);
-    if ($results) {
-        foreach ($results as $option => $coefficient) {
-            $pdf->Cell(15);
-            $pdf->MultiCell(0, 7, utf8_decode($option) . ': ' . $coefficient . ' (coef.)', 0, 'L');
-        }
-    } else {
-        $pdf->Cell(15);
-        $pdf->MultiCell(0, 7, 'Sin resultados registrados.', 0, 'L');
+$pdf->Cell(0, 10, 'Lista de Asistentes Conectados', 0, 1);
+$pdf->Ln(2);
+
+// Cabecera de la tabla
+$pdf->SetFont('Arial', 'B', 11);
+$pdf->Cell(90, 7, 'Propietario', 1);
+$pdf->Cell(40, 7, 'Propiedad', 1);
+$pdf->Cell(40, 7, 'Coeficiente', 1);
+$pdf->Ln();
+
+// Datos de la tabla
+$pdf->SetFont('Arial', '', 10);
+if (empty($attendees)) {
+    $pdf->Cell(170, 10, 'No habia asistentes conectados.', 1, 0, 'C');
+} else {
+    foreach ($attendees as $attendee) {
+        $pdf->Cell(90, 7, utf8_decode($attendee['owner_name']), 1);
+        $pdf->Cell(40, 7, utf8_decode($attendee['house_number']), 1);
+        $pdf->Cell(40, 7, $attendee['coefficient'], 1);
+        $pdf->Ln();
     }
-    $pdf->Ln(5);
 }
 
 $pdf->Output(); // Muestra el PDF en el navegador

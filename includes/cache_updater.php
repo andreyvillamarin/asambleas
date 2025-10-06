@@ -76,11 +76,6 @@ function update_meeting_cache() {
     $stmt_users->execute([$meeting['id']]);
     $connected_users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
 
-    // 5. Obtener votación activa
-    $stmt_poll = $pdo->prepare("SELECT id, question, options, duration_seconds FROM polls WHERE meeting_id = ? AND status = 'opened'");
-    $stmt_poll->execute([$meeting['id']]);
-    $active_poll = $stmt_poll->fetch(PDO::FETCH_ASSOC);
-
     // --- FIN DE CÁLCULOS ---
 
     // Preparar el array de datos para la caché
@@ -97,11 +92,14 @@ function update_meeting_cache() {
         'users' => [
             'connected_count' => count($connected_users),
             'list' => $connected_users
-        ],
-        'active_poll' => $active_poll
+        ]
     ];
 
-    // Guardar los datos en el archivo de caché
-    file_put_contents($cache_file_path, json_encode($cached_data, JSON_PRETTY_PRINT));
+    // Implementar escritura atómica para evitar condiciones de carrera.
+    $temp_cache_file_path = $cache_file_path . '.tmp';
+    if (file_put_contents($temp_cache_file_path, json_encode($cached_data, JSON_PRETTY_PRINT)) !== false) {
+        // Si la escritura en el temporal fue exitosa, renombrarlo atómicamente.
+        rename($temp_cache_file_path, $cache_file_path);
+    }
 }
 ?>

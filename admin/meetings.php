@@ -77,9 +77,9 @@ if (isset($_GET['status']) && $_GET['status'] === 'success_update') {
                         <?php elseif ($meeting['status'] === 'opened'): ?>
                             <button class="btn btn-danger close-meeting" data-id="<?php echo $meeting['id']; ?>"><i class="fas fa-stop-circle"></i> Cerrar</button>
                         <?php endif; ?>
-                        <a href="polls.php?meeting_id=<?php echo $meeting['id']; ?>" class="btn"><i class="fas fa-poll"></i> Votaciones</a>
                         <a href="powers.php?meeting_id=<?php echo $meeting['id']; ?>" class="btn"><i class="fas fa-gavel"></i> Poderes</a>
                         <a href="report.php?meeting_id=<?php echo $meeting['id']; ?>" class="btn btn-secondary" target="_blank"><i class="fas fa-file-alt"></i> Reporte</a>
+                        <button class="btn btn-danger delete-meeting" data-id="<?php echo $meeting['id']; ?>"><i class="fas fa-trash-alt"></i> Borrar</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -117,6 +117,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm('¿Estás seguro de que quieres cerrar esta reunión?')) {
                 const formData = new FormData();
                 formData.append('action', 'close_meeting');
+                formData.append('meeting_id', meetingId);
+
+                const response = await fetch('../api/admin_actions.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                alert(result.message);
+                if (result.success) {
+                    window.location.reload();
+                }
+            }
+        });
+    });
+
+    // Botón para Borrar Reunión
+    document.querySelectorAll('.delete-meeting').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const meetingId = e.target.dataset.id;
+            if (confirm('¿Estás seguro de que quieres borrar esta reunión? Esta acción no se puede deshacer.')) {
+                const formData = new FormData();
+                formData.append('action', 'delete_meeting');
                 formData.append('meeting_id', meetingId);
 
                 const response = await fetch('../api/admin_actions.php', { method: 'POST', body: formData });
