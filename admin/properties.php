@@ -46,10 +46,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_property'])) {
     }
 }
 
-// Lógica para manejar la subida del archivo CSV... (puedes expandir esto más adelante)
+// --- LÓGICA PARA IMPORTAR DESDE CSV ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
-    // ... Tu lógica de importación aquí ...
-    $success_msg = 'Importación desde CSV completada (lógica de ejemplo).';
+    if ($_FILES['csv_file']['error'] == UPLOAD_ERR_OK && is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
+        $csv_file = $_FILES['csv_file']['tmp_name'];
+        
+        $pdo->beginTransaction();
+        
+        try {
+            $handle = fopen($csv_file, "r");
+            if ($handle === FALSE) {
+                throw new Exception("No se pudo abrir el archivo CSV.");
+            }
+
+            // Omitir la cabecera
+            fgetcsv($handle, 1000, ",");
+
+            $stmt = $pdo->prepare(
+                "INSERT INTO properties (house_number, coefficient, owner_id_card, owner_name, owner_email) 
+                 VALUES (?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE 
+                 house_number=VALUES(house_number), 
+                 coefficient=VALUES(coefficient), 
+                 owner_name=VALUES(owner_name), 
+                 owner_email=VALUES(owner_email)"
+            );
+            
+            $imported_count = 0;
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                if (count($data) == 5) { // Asegurarse de que hay 5 columnas
+                    $stmt->execute($data);
+                    $imported_count++;
+                }
+            }
+            fclose($handle);
+
+            $pdo->commit();
+            $success_msg = "Importación completada. Se procesaron " . $imported_count . " registros.";
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $error_msg = "Error durante la importación: " . $e->getMessage();
+        }
+    } else {
+        $error_msg = 'Error al subir el archivo CSV.';
+    }
 }
 
 // Obtener todas las propiedades para mostrarlas en la tabla

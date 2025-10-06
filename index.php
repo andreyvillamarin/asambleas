@@ -21,7 +21,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         <!-- Logo de la empresa -->
         <img src="https://qdos.network/demos/asambleas/assets/logo.png" alt="Logo de la Empresa" style="max-width: 150px; margin-bottom: 1.5rem;">
         
-        <h1>Bienvenido a la Asamblea Virtual</h1>
+        <h1>Bienvenido(a)</h1>
 
         <!-- Paso 1: Ingresar Cédula -->
         <div id="step-1">
