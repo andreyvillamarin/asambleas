@@ -89,6 +89,16 @@ try {
         
         $response = ['success' => true, 'message' => 'Reunión y todos sus datos asociados eliminados exitosamente.'];
     }
+    elseif ($action === 'delete_power' && isset($_POST['power_id'])) {
+        $power_id = $_POST['power_id'];
+        $stmt = $pdo->prepare("DELETE FROM powers WHERE id = ?");
+        
+        if ($stmt->execute([$power_id])) {
+            $response = ['success' => true, 'message' => 'Poder eliminado correctamente.'];
+        } else {
+            $response['message'] = 'Error al eliminar el poder.';
+        }
+    }
 
 } catch (PDOException $e) {
     if ($pdo->inTransaction()) {

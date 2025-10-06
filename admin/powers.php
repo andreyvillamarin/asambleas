@@ -78,13 +78,18 @@ $assigned_powers = $stmt_powers->fetchAll(PDO::FETCH_ASSOC);
             <tr>
                 <th>Quien da el poder (Poderdante)</th>
                 <th>Quien recibe el poder (Apoderado)</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($assigned_powers as $power): ?>
-            <tr>
+            <tr data-power-row-id="<?php echo $power['id']; ?>">
                 <td><?php echo htmlspecialchars($power['giver_house'] . ' - ' . $power['giver_name']); ?></td>
                 <td><?php echo htmlspecialchars($power['receiver_house'] . ' - ' . $power['receiver_name']); ?></td>
+                <td>
+                    <a href="edit_power.php?power_id=<?php echo $power['id']; ?>&meeting_id=<?php echo $meeting_id; ?>" class="button-edit">Editar</a>
+                    <button class="button-delete" data-power-id="<?php echo $power['id']; ?>">Eliminar</button>
+                </td>
             </tr>
             <?php endforeach; ?>
         </tbody>
@@ -94,3 +99,39 @@ $assigned_powers = $stmt_powers->fetchAll(PDO::FETCH_ASSOC);
 <?php
 require_once 'includes/footer.php';
 ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.button-delete');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const powerId = this.dataset.powerId;
+            if (confirm('¿Está seguro de que desea eliminar este poder?')) {
+                fetch('../api/admin_actions.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=delete_power&power_id=${powerId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Eliminar la fila de la tabla
+                        const row = document.querySelector(`tr[data-power-row-id="${powerId}"]`);
+                        if (row) {
+                            row.remove();
+                        }
+                        alert(data.message); // O mostrar un mensaje más sutil
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ocurrió un error al procesar la solicitud.');
+                });
+            }
+        });
+    });
+});
+</script>
