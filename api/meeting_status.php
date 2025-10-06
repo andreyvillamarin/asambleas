@@ -1,5 +1,9 @@
 <?php
 // api/meeting_status.php
+
+// Cargar la configuración de la sesión ANTES de iniciarla.
+require_once '../includes/session_config.php';
+
 // Este script ahora limpia sesiones obsoletas antes de reportar el estado.
 session_start(); // Necesario para la sesión, aunque no se use para validar el acceso aquí.
 

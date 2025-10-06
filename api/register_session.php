@@ -1,5 +1,9 @@
 <?php
 // api/register_session.php
+
+// Cargar la configuración de la sesión ANTES de iniciarla.
+require_once '../includes/session_config.php';
+
 session_start();
 header('Content-Type: application/json');
 

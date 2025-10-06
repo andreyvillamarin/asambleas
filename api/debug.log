@@ -191,3 +191,122 @@
 [2025-10-06 08:43:23] Reunión activa encontrada (ID: 5). Procediendo a registrar sesión de usuario.
 [2025-10-06 08:43:23] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
 [2025-10-06 08:43:23] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-10-06 09:09:26] --- Nueva solicitud a login.php ---
+[2025-10-06 09:09:26] Dependencias cargadas correctamente.
+[2025-10-06 09:09:26] Acción recibida: 'check_id'
+[2025-10-06 09:09:26] Iniciando 'check_id' para la cédula: '55167759'
+[2025-10-06 09:09:26] Preparando la consulta a la base de datos.
+[2025-10-06 09:09:26] Ejecutando la consulta.
+[2025-10-06 09:09:26] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-10-06 09:09:26] Datos del usuario preparados para la respuesta.
+[2025-10-06 09:09:26] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero Barreto","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-10-06 09:09:27] --- Nueva solicitud a login.php ---
+[2025-10-06 09:09:27] Dependencias cargadas correctamente.
+[2025-10-06 09:09:27] Acción recibida: 'send_code'
+[2025-10-06 09:09:27] Iniciando 'send_code' para la cédula: '55167759'
+[2025-10-06 09:09:27] Código generado (047353) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-10-06 09:09:27] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-10-06 09:09:27] API Key obtenida correctamente.
+[2025-10-06 09:09:27] Cliente de la API de Brevo configurado con timeouts y el host: https://api.brevo.com/v3
+[2025-10-06 09:09:27] Objeto de email creado. Listo para enviar.
+[2025-10-06 09:09:27] Llamada a sendTransacEmail completada. Respuesta de la API: {
+    "messageId": "<202510061409.32991119944@smtp-relay.mailin.fr>"
+}
+[2025-10-06 09:09:27] Email enviado exitosamente a andreyvillamarin@gmail.com con Message ID: <202510061409.32991119944@smtp-relay.mailin.fr>
+[2025-10-06 09:09:27] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-10-06 09:09:40] --- Nueva solicitud a login.php ---
+[2025-10-06 09:09:40] Dependencias cargadas correctamente.
+[2025-10-06 09:09:40] Acción recibida: 'verify_code'
+[2025-10-06 09:09:40] Iniciando 'verify_code' para la cédula: '55167759' con el código: '047353'
+[2025-10-06 09:09:40] Reunión activa encontrada (ID: 5). Procediendo a registrar sesión de usuario.
+[2025-10-06 09:09:40] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-10-06 09:09:40] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-10-06 09:16:10] --- Nueva solicitud a login.php ---
+[2025-10-06 09:16:10] Dependencias cargadas correctamente.
+[2025-10-06 09:16:10] Acción recibida: 'check_id'
+[2025-10-06 09:16:10] Iniciando 'check_id' para la cédula: '55167759'
+[2025-10-06 09:16:10] Preparando la consulta a la base de datos.
+[2025-10-06 09:16:10] Ejecutando la consulta.
+[2025-10-06 09:16:10] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-10-06 09:16:10] Datos del usuario preparados para la respuesta.
+[2025-10-06 09:16:10] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero Barreto","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-10-06 09:16:11] --- Nueva solicitud a login.php ---
+[2025-10-06 09:16:11] Dependencias cargadas correctamente.
+[2025-10-06 09:16:11] Acción recibida: 'send_code'
+[2025-10-06 09:16:11] Iniciando 'send_code' para la cédula: '55167759'
+[2025-10-06 09:16:11] Código generado (283334) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-10-06 09:16:11] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-10-06 09:16:11] API Key obtenida correctamente.
+[2025-10-06 09:16:11] Cliente de la API de Brevo configurado con timeouts y el host: https://api.brevo.com/v3
+[2025-10-06 09:16:11] Objeto de email creado. Listo para enviar.
+[2025-10-06 09:16:11] Llamada a sendTransacEmail completada. Respuesta de la API: {
+    "messageId": "<202510061416.74810695391@smtp-relay.mailin.fr>"
+}
+[2025-10-06 09:16:11] Email enviado exitosamente a andreyvillamarin@gmail.com con Message ID: <202510061416.74810695391@smtp-relay.mailin.fr>
+[2025-10-06 09:16:11] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-10-06 09:16:20] --- Nueva solicitud a login.php ---
+[2025-10-06 09:16:20] Dependencias cargadas correctamente.
+[2025-10-06 09:16:20] Acción recibida: 'verify_code'
+[2025-10-06 09:16:20] Iniciando 'verify_code' para la cédula: '55167759' con el código: '283334'
+[2025-10-06 09:16:20] Verificación exitosa para la cédula 55167759. No hay reunión activa. Redirigiendo a la sala de espera.
+[2025-10-06 09:16:20] Respuesta final enviada: {"success":true,"redirect":"waiting_room.php"}
+[2025-10-06 09:26:21] --- Nueva solicitud a login.php ---
+[2025-10-06 09:26:21] Dependencias cargadas correctamente.
+[2025-10-06 09:26:21] Acción recibida: 'check_id'
+[2025-10-06 09:26:21] Iniciando 'check_id' para la cédula: '55167759'
+[2025-10-06 09:26:21] Preparando la consulta a la base de datos.
+[2025-10-06 09:26:21] Ejecutando la consulta.
+[2025-10-06 09:26:21] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-10-06 09:26:21] Datos del usuario preparados para la respuesta.
+[2025-10-06 09:26:21] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero Barreto","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-10-06 09:26:22] --- Nueva solicitud a login.php ---
+[2025-10-06 09:26:22] Dependencias cargadas correctamente.
+[2025-10-06 09:26:22] Acción recibida: 'send_code'
+[2025-10-06 09:26:22] Iniciando 'send_code' para la cédula: '55167759'
+[2025-10-06 09:26:22] Código generado (494408) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-10-06 09:26:22] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-10-06 09:26:22] API Key obtenida correctamente.
+[2025-10-06 09:26:22] Cliente de la API de Brevo configurado con timeouts y el host: https://api.brevo.com/v3
+[2025-10-06 09:26:22] Objeto de email creado. Listo para enviar.
+[2025-10-06 09:26:23] Llamada a sendTransacEmail completada. Respuesta de la API: {
+    "messageId": "<202510061426.55883938767@smtp-relay.mailin.fr>"
+}
+[2025-10-06 09:26:23] Email enviado exitosamente a andreyvillamarin@gmail.com con Message ID: <202510061426.55883938767@smtp-relay.mailin.fr>
+[2025-10-06 09:26:23] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-10-06 09:26:35] --- Nueva solicitud a login.php ---
+[2025-10-06 09:26:35] Dependencias cargadas correctamente.
+[2025-10-06 09:26:35] Acción recibida: 'verify_code'
+[2025-10-06 09:26:35] Iniciando 'verify_code' para la cédula: '55167759' con el código: '494408'
+[2025-10-06 09:26:35] Reunión activa encontrada (ID: 5). Procediendo a registrar sesión de usuario.
+[2025-10-06 09:26:35] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-10-06 09:26:35] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}
+[2025-10-06 09:47:27] --- Nueva solicitud a login.php ---
+[2025-10-06 09:47:27] Dependencias cargadas correctamente.
+[2025-10-06 09:47:27] Acción recibida: 'check_id'
+[2025-10-06 09:47:27] Iniciando 'check_id' para la cédula: '55167759'
+[2025-10-06 09:47:27] Preparando la consulta a la base de datos.
+[2025-10-06 09:47:27] Ejecutando la consulta.
+[2025-10-06 09:47:27] Consulta ejecutada. Resultado: Usuario encontrado
+[2025-10-06 09:47:27] Datos del usuario preparados para la respuesta.
+[2025-10-06 09:47:27] Respuesta final enviada: {"success":true,"data":{"name":"Yolima Quintero Barreto","house":"2B3","email_hint":"a***************@g****.com"}}
+[2025-10-06 09:47:29] --- Nueva solicitud a login.php ---
+[2025-10-06 09:47:29] Dependencias cargadas correctamente.
+[2025-10-06 09:47:29] Acción recibida: 'send_code'
+[2025-10-06 09:47:29] Iniciando 'send_code' para la cédula: '55167759'
+[2025-10-06 09:47:29] Código generado (730294) para andreyvillamarin@gmail.com. Intentando enviar email...
+[2025-10-06 09:47:29] Iniciando send_login_code para andreyvillamarin@gmail.com.
+[2025-10-06 09:47:29] API Key obtenida correctamente.
+[2025-10-06 09:47:29] Cliente de la API de Brevo configurado con timeouts y el host: https://api.brevo.com/v3
+[2025-10-06 09:47:29] Objeto de email creado. Listo para enviar.
+[2025-10-06 09:47:30] Llamada a sendTransacEmail completada. Respuesta de la API: {
+    "messageId": "<202510061447.62907259459@smtp-relay.mailin.fr>"
+}
+[2025-10-06 09:47:30] Email enviado exitosamente a andreyvillamarin@gmail.com con Message ID: <202510061447.62907259459@smtp-relay.mailin.fr>
+[2025-10-06 09:47:30] Respuesta final enviada: {"success":true,"message":"C\u00f3digo enviado correctamente."}
+[2025-10-06 09:47:41] --- Nueva solicitud a login.php ---
+[2025-10-06 09:47:41] Dependencias cargadas correctamente.
+[2025-10-06 09:47:41] Acción recibida: 'verify_code'
+[2025-10-06 09:47:41] Iniciando 'verify_code' para la cédula: '55167759' con el código: '730294'
+[2025-10-06 09:47:41] Reunión activa encontrada (ID: 5). Procediendo a registrar sesión de usuario.
+[2025-10-06 09:47:41] Verificación exitosa para la cédula 55167759. Redirigiendo a meeting.php.
+[2025-10-06 09:47:41] Respuesta final enviada: {"success":true,"redirect":"meeting.php"}

@@ -1,4 +1,7 @@
 <?php
+// Cargar la configuración de la sesión ANTES de iniciarla.
+require_once 'includes/session_config.php';
+
 session_start();
 
 // 1. Verificar que el usuario tenga una sesión completamente válida.

@@ -3,6 +3,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 // admin/login.php
+
+// Cargar la configuración de la sesión ANTES de iniciarla.
+require_once __DIR__ . '/../includes/session_config.php';
+
 session_start();
 require_once __DIR__ . '/../includes/db.php'; // Conexión a la BD
 $error = '';

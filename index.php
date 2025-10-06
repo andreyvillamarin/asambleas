@@ -1,4 +1,7 @@
 <?php
+// Cargar la configuración de la sesión ANTES de iniciarla.
+require_once 'includes/session_config.php';
+
 session_start();
 
 // Si el usuario ya está logueado, redirigirlo directamente a la reunión.
